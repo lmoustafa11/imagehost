@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Pro | CCC Branded Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        .portal-wrapper {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 1100px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+
+        h1 {
+            font-size: 3.2rem !important;
+            font-weight: 900 !important;
+            color: #1a1a1a;
+            line-height: 0.95;
+            margin-bottom: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            -webkit-text-stroke: 0.5px black;
+            text-shadow: 
+                -1px -1px 0 #000,  
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000,
+                2px 2px 0 white,
+                3px 3px 0 white;
+        }
+
+        .logo {
+            max-width: 260px;
+            height: auto;
+            flex-shrink: 0;
+        }
+
+        .filter-container {
+            background: #e8f4f8;
+            border-left: 4px solid #2563eb;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-styled {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-styled:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .label-styled {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .quick-filter-btn {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid #bfdbfe;
+        }
+
+        .quick-filter-btn.active {
+            background-color: #1e40af !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+            border-color: #1e40af !important;
+        }
+
+        .trainee-list-box {
+            border: 2px solid #4a5f7f;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        .trainee-row { 
+            transition: all 0.2s ease; 
+            border-bottom: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .trainee-row:last-child { border-bottom: 0; }
+
+        .trainee-row:hover { 
+            background-color: #f1f5f9; 
+            transform: translateX(6px);
+        }
+
+        .sync-pulse { 
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; 
+        }
+
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; transform: scale(1); } 
+            50% { opacity: .4; transform: scale(1.2); } 
+        }
+
+        .loader { 
+            border-top-color: #2563eb; 
+            animation: spinner 0.8s linear infinite; 
+        }
+
+        @keyframes spinner { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+
+        .modal-enter { 
+            animation: modalFadeIn 0.3s ease-out forwards; 
+        }
+
+        @keyframes modalFadeIn { 
+            from { opacity: 0; transform: scale(0.95) translateY(10px); } 
+            to { opacity: 1; transform: scale(1) translateY(0); } 
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        @media (max-width: 850px) {
+            .header { flex-direction: column; text-align: center; }
+            h1 { font-size: 2.2rem !important; }
+            .logo { max-width: 220px; }
+            body { padding: 20px 10px; }
+            .portal-wrapper { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-wrapper">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="title-section">
+                <h1>ATTENDANCE PORTAL</h1>
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mt-4 flex items-center gap-2">
+                    <span id="sync-indicator" class="w-2.5 h-2.5 bg-emerald-500 rounded-full sync-pulse"></span>
+                    Live Sync Active • Version <span id="sheet-version">0</span>
+                </p>
+            </div>
+            <img src="https://raw.githubusercontent.com/lmoustafa11/imagehost/main/Radnet%20logo%20hi-rescropped.png" alt="RadNet Logo" class="logo">
+        </header>
+
+        <!-- Filter Container -->
+        <div class="filter-container">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <label class="label-styled">Global Search</label>
+                    <input type="text" id="global-search" oninput="renderStudents()" placeholder="Name or SL ID..." class="input-styled">
+                </div>
+                <div>
+                    <label class="label-styled">Class ID Search</label>
+                    <input type="text" id="class-id-filter" oninput="renderStudents()" placeholder="Filter Class..." class="input-styled">
+                </div>
+                <div>
+                    <label class="label-styled">Specific Start Date</label>
+                    <input type="date" id="date-filter" onchange="renderStudents()" class="input-styled">
+                </div>
+                <div>
+                    <label class="label-styled">Show Attendance</label>
+                    <select id="status-filter" onchange="renderStudents()" class="input-styled">
+                        <option value="all">Show All</option>
+                        <option value="present">Present</option>
+                        <option value="absent">Absent</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Quick Auto Filters Toolbar -->
+            <div id="quick-filters-toolbar" class="flex flex-wrap gap-2 mt-6 pt-4 border-t border-blue-200/50">
+                <button onclick="setQuickFilter('current')" id="btn-current" class="quick-filter-btn px-4 py-2 bg-blue-600 text-white rounded text-[10px] font-black uppercase tracking-widest shadow-md">Current (Last 26 Days)</button>
+                <button onclick="setQuickFilter('all')" id="btn-all" class="quick-filter-btn px-4 py-2 bg-white text-blue-600 rounded text-[10px] font-black uppercase tracking-widest hover:bg-blue-50">Show All Records</button>
+            </div>
+
+            <div class="flex justify-between items-center mt-6 pt-4 border-t border-blue-200/50">
+                <p id="sheet-name-display" class="text-[10px] font-black text-blue-800/60 uppercase tracking-widest italic">Loading Sheet Details...</p>
+                <div class="flex gap-2">
+                    <button onclick="fetchSharing()" class="px-4 py-1.5 bg-blue-600 text-white rounded text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-200">Collaborators</button>
+                    <button onclick="fetchSheetData()" class="p-1.5 bg-white border border-blue-200 text-blue-600 rounded hover:bg-blue-50 transition-colors" title="Manual Sync"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trainee List -->
+        <main id="main-content">
+            <div id="loading-overlay" class="flex flex-col items-center justify-center py-20">
+                <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-10 w-10 mb-4"></div>
+                <p class="text-slate-400 font-black uppercase tracking-widest text-[9px]">Verifying Grid State...</p>
+            </div>
+
+            <div id="dashboard" class="hidden">
+                <div class="trainee-list-box">
+                    <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                        <h2 class="font-black text-slate-800 uppercase tracking-tight text-xs">Active Trainee Roster</h2>
+                        <span id="trainee-count" class="text-[9px] bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-black uppercase">0 TRAINEES</span>
+                    </div>
+                    <div id="students-container">
+                        <!-- Rows injected here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Trainee Detail Modal -->
+        <div id="detail-modal" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden modal-enter border-t-8 border-blue-600">
+                <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                    <div class="flex items-center gap-6">
+                        <div id="detail-avatar" class="w-16 h-16 rounded bg-slate-900 text-white flex items-center justify-center text-2xl font-black shadow-lg">?</div>
+                        <div>
+                            <h3 id="detail-title" class="text-2xl font-black text-slate-900 leading-tight uppercase tracking-tight">Name</h3>
+                            <div class="flex gap-2 mt-1">
+                                <span id="detail-subtitle" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">ID: ---</span>
+                                <span id="detail-class-badge" class="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-widest">Class: ---</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="closeDetailModal()" class="text-slate-300 hover:text-slate-900"><i data-lucide="x" class="w-8 h-8"></i></button>
+                </div>
+                <div id="detail-fields" class="flex-1 overflow-y-auto p-10 grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#f8f9fa]"></div>
+                <div class="p-8 border-t border-slate-100 bg-white flex justify-end gap-3">
+                    <button onclick="closeDetailModal()" class="px-8 py-3 font-black text-slate-500 hover:bg-slate-50 uppercase text-xs tracking-widest">Cancel</button>
+                    <button id="save-detail-btn" class="px-10 py-3 bg-blue-600 text-white font-black shadow-xl hover:bg-blue-700 transition-all flex items-center gap-2 uppercase text-xs tracking-widest">
+                        <i data-lucide="cloud-upload" class="w-4 h-4"></i> Sync to Smartsheet
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sharing Modal -->
+        <div id="sharing-modal" class="fixed inset-0 bg-slate-900/70 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded shadow-2xl w-full max-w-lg p-10 modal-enter border-t-8 border-emerald-500">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-black text-slate-900 uppercase">Sheet Collaborators</h3>
+                    <button onclick="document.getElementById('sharing-modal').classList.add('hidden')" class="text-slate-400"><i data-lucide="x"></i></button>
+                </div>
+                <div id="sharing-list" class="space-y-3 max-h-80 overflow-y-auto pr-2"></div>
+                <button onclick="document.getElementById('sharing-modal').classList.add('hidden')" class="w-full mt-8 bg-slate-900 text-white py-4 rounded font-black uppercase text-xs">Close</button>
+            </div>
+        </div>
+
+        <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 px-8 py-4 rounded shadow-2xl opacity-0 pointer-events-none transition-all duration-300 transform translate-y-4 flex items-center gap-3 z-[100] font-black uppercase text-[10px] tracking-widest">
+            <span id="toast-message">Success</span>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CORE SYNC ENGINE (LOCKED & RETAINED)
+        // ==========================================
+        const DEFAULT_TOKEN = 'HfG7wj4gWeUTwyj4H0nFUvoWvnLHOsuYDD1Kz';
+        const DEFAULT_SHEET_ID = '7225696003772292';
+        const getProxyUrl = (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`;
+
+        let appData = {
+            token: DEFAULT_TOKEN,
+            sheetId: DEFAULT_SHEET_ID,
+            columns: [],
+            rows: [],
+            version: 0,
+            mapping: {},
+            isModalOpen: false,
+            syncActive: false,
+            quickFilter: 'current'
+        };
+
+        window.onload = () => {
+            lucide.createIcons();
+            fetchSheetData();
+            initSmartPolling();
+            updateQuickFilterUI();
+        };
+
+        function initSmartPolling() {
+            setInterval(async () => {
+                if (appData.isModalOpen || appData.syncActive) return;
+                try {
+                    const url = `https://api.smartsheet.com/2.0/sheets/${appData.sheetId}?level=1&t=${Date.now()}`;
+                    const response = await fetch(getProxyUrl(url), {
+                        headers: { 'Authorization': `Bearer ${appData.token}`, 'Accept': 'application/json' }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.version > appData.version) fetchSheetData(true);
+                    }
+                } catch (e) {}
+            }, 10000);
+        }
+
+        async function fetchSheetData(isSilent = false) {
+            if (appData.syncActive) return;
+            appData.syncActive = true;
+            const loading = document.getElementById('loading-overlay');
+            const dashboard = document.getElementById('dashboard');
+            const indicator = document.getElementById('sync-indicator');
+            if (!isSilent) { loading.classList.remove('hidden'); dashboard.classList.add('hidden'); }
+            indicator.className = "w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse";
+            try {
+                const url = `https://api.smartsheet.com/2.0/sheets/${appData.sheetId}?t=${Date.now()}`;
+                const response = await fetch(getProxyUrl(url), {
+                    headers: { 'Authorization': `Bearer ${appData.token}`, 'Accept': 'application/json' }
+                });
+                const data = await response.json();
+                appData.columns = data.columns;
+                appData.rows = data.rows;
+                appData.version = data.version;
+                document.getElementById('sheet-version').textContent = data.version;
+                document.getElementById('sheet-name-display').textContent = `CONNECTED: ${data.name}`;
+                autoMap();
+                generateDynamicFilters();
+                renderStudents();
+                dashboard.classList.remove('hidden');
+                indicator.className = "w-2.5 h-2.5 bg-emerald-500 rounded-full sync-pulse";
+            } catch (error) { indicator.className = "w-2.5 h-2.5 bg-red-500 rounded-full"; }
+            finally { loading.classList.add('hidden'); appData.syncActive = false; }
+        }
+
+        async function saveTraineeChanges(rowId) {
+            const container = document.getElementById('detail-fields');
+            const numericRowId = Number(rowId);
+            const editableInputs = Array.from(container.querySelectorAll('input:not([disabled]), select:not([disabled])'));
+            
+            const updatedCells = editableInputs.map(input => {
+                const colId = Number(input.getAttribute('data-colid'));
+                const col = appData.columns.find(c => c.id === colId);
+                let val = input.type === 'checkbox' ? input.checked : input.value;
+                if (col) {
+                    if (col.type === 'CHECKBOX') val = Boolean(val);
+                    else if (col.type === 'NUMBER' || col.type === 'ABSTRACT_NUMBER') {
+                        if (val === "" || val === null) val = null;
+                        else { const num = parseFloat(val); val = isNaN(num) ? val : num; }
+                    } else val = String(val);
+                }
+                return { columnId: colId, value: val };
+            });
+
+            if (updatedCells.length === 0) { showToast("No editable changes detected."); closeDetailModal(); return; }
+            closeDetailModal();
+            showToast("Pushing to Smartsheet...");
+
+            try {
+                const url = `https://api.smartsheet.com/2.0/sheets/${appData.sheetId}/rows`;
+                const response = await fetch(getProxyUrl(url), {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${appData.token}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify([{ id: numericRowId, cells: updatedCells }])
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    let message = `Sync Error: ${response.status}`;
+                    try { const errorJson = JSON.parse(errorText); message = errorJson.message || message; } catch (e) {
+                        if (errorText.includes("<!DOCTYPE")) message = "Smartsheet rejected data format.";
+                    }
+                    throw new Error(message);
+                }
+                showToast("Push Successful!");
+                setTimeout(() => fetchSheetData(true), 500);
+            } catch (error) { console.error("Sync Failure:", error); showToast(error.message, true); }
+        }
+
+        function autoMap() {
+            appData.mapping = {};
+            appData.columns.forEach(col => {
+                const t = col.title.toLowerCase().trim();
+                if (t.includes('name') || t.includes('trainee')) appData.mapping.name = col.id;
+                if (t.includes('class id')) appData.mapping.classId = col.id;
+                if (col.type === 'CHECKBOX' || t.includes('attendance')) appData.mapping.attendance = col.id;
+                
+                // FLEXIBLE PRECISION MAPPING: Scans for Start Date and prioritizes for roster consistency
+                if (t.includes('start date')) appData.mapping.date = col.id;
+                
+                if (t.includes('sl id') || t.includes('student id')) appData.mapping.slid = col.id;
+                if (t === 'active' || t === 'status' || t.includes('employment status')) appData.mapping.status = col.id;
+            });
+        }
+
+        // ==========================================
+        // UI & FILTER LOGIC
+        // ==========================================
+
+        function setQuickFilter(type) {
+            appData.quickFilter = type;
+            updateQuickFilterUI();
+            renderStudents();
+        }
+
+        function updateQuickFilterUI() {
+            document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                btn.classList.add('bg-white', 'text-blue-600');
+            });
+            const activeId = appData.quickFilter.includes(':') ? `btn-${appData.quickFilter.replace(/:/g, '-')}` : `btn-${appData.quickFilter}`;
+            const activeBtn = document.getElementById(activeId);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'bg-blue-600', 'text-white');
+                activeBtn.classList.remove('bg-white', 'text-blue-600');
+            }
+        }
+
+        function generateDynamicFilters() {
+            const toolbar = document.getElementById('quick-filters-toolbar');
+            const staticButtons = ['btn-current', 'btn-all'];
+            Array.from(toolbar.children).forEach(btn => { if (!staticButtons.includes(btn.id)) btn.remove(); });
+
+            const uniqueClassIds = new Set();
+            const uniqueSlIds = new Set();
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const threshold = new Date();
+            threshold.setDate(today.getDate() - 26);
+            threshold.setHours(0,0,0,0);
+
+            appData.rows.forEach(row => {
+                const dateCell = row.cells.find(c => c.columnId === appData.mapping.date);
+                const classCell = row.cells.find(c => c.columnId === appData.mapping.classId);
+                const slidCell = row.cells.find(c => c.columnId === appData.mapping.slid);
+                const dateStr = dateCell?.value || "";
+                if (!dateStr) return;
+                const rowDate = new Date(dateStr + "T00:00:00");
+                if (rowDate >= threshold && rowDate <= today) {
+                    if (classCell?.displayValue) uniqueClassIds.add(classCell.displayValue);
+                    if (slidCell?.displayValue) uniqueSlIds.add(slidCell.displayValue);
+                }
+            });
+
+            Array.from(uniqueClassIds).sort().forEach(id => {
+                const btn = document.createElement('button');
+                btn.id = `btn-class-${id}`;
+                btn.className = "quick-filter-btn px-4 py-2 bg-white text-blue-600 rounded text-[10px] font-black uppercase tracking-widest hover:bg-blue-50";
+                btn.textContent = `Class: ${id}`;
+                btn.onclick = () => setQuickFilter(`class:${id}`);
+                toolbar.appendChild(btn);
+            });
+
+            Array.from(uniqueSlIds).sort().forEach(id => {
+                const btn = document.createElement('button');
+                btn.id = `btn-slid-${id}`;
+                btn.className = "quick-filter-btn px-4 py-2 bg-white text-blue-600 rounded text-[10px] font-black uppercase tracking-widest hover:bg-blue-50";
+                btn.textContent = `SL ID: ${id}`;
+                btn.onclick = () => setQuickFilter(`slid:${id}`);
+                toolbar.appendChild(btn);
+            });
+            updateQuickFilterUI();
+        }
+
+        async function fetchSharing() {
+            const list = document.getElementById('sharing-list');
+            list.innerHTML = '<p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center py-4 italic text-center">Loading...</p>';
+            document.getElementById('sharing-modal').classList.remove('hidden');
+            try {
+                const url = `https://api.smartsheet.com/2.0/sheets/${appData.sheetId}/shares?t=${Date.now()}`;
+                const response = await fetch(getProxyUrl(url), { headers: { 'Authorization': `Bearer ${appData.token}` } });
+                const data = await response.json();
+                list.innerHTML = data.data.map(user => `
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-black text-slate-900">${user.email || user.name}</span>
+                            <span class="text-[9px] font-bold text-blue-600 uppercase tracking-widest">${user.accessLevel}</span>
+                        </div>
+                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            } catch (e) { list.innerHTML = '<p class="text-xs text-red-500 text-center">Error loading collaborators.</p>'; }
+        }
+
+        function renderStudents() {
+            const container = document.getElementById('students-container');
+            const gSearch = document.getElementById('global-search').value.toLowerCase();
+            const classSearch = document.getElementById('class-id-filter').value.toLowerCase();
+            const dateSearch = document.getElementById('date-filter').value;
+            const statusSearch = document.getElementById('status-filter').value;
+            container.innerHTML = '';
+
+            const filtered = appData.rows.filter(row => {
+                const nameCell = row.cells.find(c => c.columnId === appData.mapping.name);
+                const slidCell = row.cells.find(c => c.columnId === appData.mapping.slid);
+                const classCell = row.cells.find(c => c.columnId === appData.mapping.classId);
+                const dateCell = row.cells.find(c => c.columnId === appData.mapping.date);
+                const attCell = row.cells.find(c => c.columnId === appData.mapping.attendance);
+
+                const name = (nameCell?.displayValue || nameCell?.value || "").toLowerCase();
+                const slidValue = (slidCell?.displayValue || slidCell?.value || "").toString();
+                const classIdValue = (classCell?.displayValue || classCell?.value || "").toString();
+                const date = dateCell?.value || "";
+                const att = attCell?.value === true;
+
+                let isMatch = (!gSearch || name.includes(gSearch) || slidValue.toLowerCase().includes(gSearch)) &&
+                       (!classSearch || classIdValue.toLowerCase().includes(classSearch)) &&
+                       (!dateSearch || date === dateSearch) &&
+                       (statusSearch === 'all' || (statusSearch === 'present' && att) || (statusSearch === 'absent' && !att));
+
+                if (!isMatch) return false;
+
+                if (appData.quickFilter === 'current') {
+                    if (!date) return false;
+                    const rowDate = new Date(date + "T00:00:00");
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    const threshold = new Date(); threshold.setDate(today.getDate() - 26); threshold.setHours(0,0,0,0);
+                    if (rowDate < threshold || rowDate > today) return false;
+                } else if (appData.quickFilter.startsWith('class:')) {
+                    if (classIdValue !== appData.quickFilter.split(':')[1]) return false;
+                } else if (appData.quickFilter.startsWith('slid:')) {
+                    if (slidValue !== appData.quickFilter.split(':')[1]) return false;
+                }
+                return true;
+            });
+
+            document.getElementById('trainee-count').textContent = `${filtered.length} TRAINEES`;
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="p-20 text-center text-slate-400 font-bold uppercase tracking-widest text-[10px]">No records found</div>';
+                return;
+            }
+            filtered.forEach(row => {
+                const name = row.cells.find(c => c.columnId === appData.mapping.name)?.displayValue || "Unnamed";
+                const classId = row.cells.find(c => c.columnId === appData.mapping.classId)?.displayValue || "---";
+                const slid = row.cells.find(c => c.columnId === appData.mapping.slid)?.displayValue || "---";
+                
+                // DATA ALIGNMENT: Ensures date matches the card highlight precisely
+                const startDate = row.cells.find(c => c.columnId === appData.mapping.date)?.displayValue || "N/A";
+                
+                const statusCell = row.cells.find(c => c.columnId === appData.mapping.status);
+                const statusStr = (statusCell?.displayValue || statusCell?.value || "").toLowerCase();
+                
+                let iconColor = 'bg-slate-400';
+                if (statusStr === 'active') iconColor = 'bg-emerald-600 shadow-emerald-100 shadow-lg';
+                else if (statusStr === 'terminated') iconColor = 'bg-red-600 shadow-red-100 shadow-lg';
+
+                const el = document.createElement('div');
+                el.className = "trainee-row flex items-center justify-between px-8 py-5 cursor-pointer";
+                el.onclick = () => openDetailModal(row.id);
+                el.innerHTML = `
+                    <div class="flex items-center gap-5">
+                        <div class="w-11 h-11 rounded flex items-center justify-center font-black text-white ${iconColor}">${name[0].toUpperCase()}</div>
+                        <div>
+                            <p class="font-black text-slate-900 text-sm uppercase tracking-tight">${name}</p>
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                Start: ${startDate} • Class: ${classId} • SL ID: ${slid} • Status: ${statusStr || 'N/A'}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i>
+                    </div>`;
+                container.appendChild(el);
+            });
+            lucide.createIcons();
+        }
+
+        function openDetailModal(rowId) {
+            appData.isModalOpen = true;
+            const row = appData.rows.find(r => r.id === rowId);
+            const name = row.cells.find(c => c.columnId === appData.mapping.name)?.displayValue || "Trainee Info";
+            const slid = row.cells.find(c => c.columnId === appData.mapping.slid)?.displayValue || "---";
+            const classId = row.cells.find(c => c.columnId === appData.mapping.classId)?.displayValue || "---";
+            document.getElementById('detail-title').textContent = name;
+            document.getElementById('detail-subtitle').textContent = `ID: ${slid}`;
+            document.getElementById('detail-class-badge').textContent = `Class: ${classId}`;
+            document.getElementById('detail-avatar').textContent = name[0].toUpperCase();
+            const fields = document.getElementById('detail-fields');
+            fields.innerHTML = '';
+            appData.columns.forEach(col => {
+                const cell = row.cells.find(c => c.columnId === col.id) || {};
+                const wrap = document.createElement('div');
+                wrap.className = "space-y-1.5";
+                
+                const isDuration = col.type === 'DURATION' || col.title.toLowerCase().includes('duration');
+                const isReadOnly = col.systemColumnType || col.formula || col.autoNumber || isDuration || col.type === 'PREDECESSORS';
+                const disabledAttr = isReadOnly ? 'disabled' : '';
+                const inputClass = isReadOnly ? 'bg-slate-100 text-slate-500 cursor-not-allowed border-slate-200' : 'bg-white border-slate-200 focus:ring-1 focus:ring-blue-500';
+                
+                let input = '';
+                if (col.type === 'CHECKBOX') {
+                    input = `<label class="flex items-center gap-4 p-4 ${inputClass} rounded ${isReadOnly ? '' : 'cursor-pointer'}">
+                        <input type="checkbox" data-colid="${col.id}" ${cell.value === true ? 'checked' : ''} ${disabledAttr} class="w-6 h-6 rounded text-blue-600 cursor-pointer">
+                        <span class="text-xs font-black uppercase tracking-widest ${isReadOnly ? 'text-slate-400' : 'text-slate-800'}">Attendance / Task Complete</span>
+                    </label>`;
+                } else if (col.type === 'DATE') {
+                    input = `<input type="date" data-colid="${col.id}" value="${cell.value || ''}" ${disabledAttr} class="w-full p-4 ${inputClass} rounded text-sm font-bold outline-none">`;
+                } else if (col.type === 'PICKLIST') {
+                    const options = col.options ? col.options.map(opt => `<option value="${opt}" ${cell.value === opt ? 'selected' : ''}>${opt}</option>`).join('') : '';
+                    input = `<select data-colid="${col.id}" ${disabledAttr} class="w-full p-4 ${inputClass} rounded text-sm font-bold outline-none">${options}</select>`;
+                } else {
+                    input = `<input type="text" data-colid="${col.id}" value="${cell.displayValue || cell.value || ''}" ${disabledAttr} class="w-full p-4 ${inputClass} rounded text-sm font-bold outline-none">`;
+                }
+                wrap.innerHTML = `<label class="text-[9px] font-black text-blue-900/60 uppercase tracking-widest ml-1">${col.title} ${isReadOnly ? '(Locked)' : ''}</label>${input}`;
+                fields.appendChild(wrap);
+            });
+            document.getElementById('save-detail-btn').onclick = () => saveTraineeChanges(rowId);
+            document.getElementById('detail-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeDetailModal() { appData.isModalOpen = false; document.getElementById('detail-modal').classList.add('hidden'); }
+        
+        // ESC key to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && appData.isModalOpen) {
+                closeDetailModal();
+            }
+        });
+        
+        function showToast(m, e=false) { 
+            const t = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = m;
+            t.className = `fixed bottom-8 left-1/2 -translate-x-1/2 px-8 py-4 rounded shadow-2xl opacity-1 transition-all duration-300 transform translate-y-0 flex items-center gap-3 z-[100] font-black uppercase text-[10px] tracking-widest ${e ? 'bg-red-600 text-white' : 'bg-slate-900 text-white'}`;
+            setTimeout(() => { t.className = t.className.replace('opacity-1', 'opacity-0').replace('translate-y-0', 'translate-y-4'); }, 3000);
+        }
+    </script>
+</body>
+</html>
