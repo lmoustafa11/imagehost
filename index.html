@@ -2,10 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=attendance_portal_FINAL.html">
-    <title>Redirecting to Attendance Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management & Training Hub</title>
+    <style>
+        :root {
+            --primary-color: #1E315A; /* Radnet Blue */
+            --secondary-color: #007bff;
+            --bg-color: #f8f9fa;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        h1 { color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.8rem; }
+        p { color: #666; margin-bottom: 2rem; }
+        
+        .button-grid { display: flex; flex-direction: column; gap: 12px; }
+        
+        .nav-button {
+            display: block;
+            padding: 15px 20px;
+            background-color: white;
+            color: var(--primary-color);
+            text-decoration: none;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(30, 49, 90, 0.2);
+        }
+
+        .footer { margin-top: 2rem; font-size: 0.8rem; color: #aaa; }
+    </style>
 </head>
 <body>
-    <p>Redirecting you to the <a href="attendance_portal_FINAL.html">Attendance Portal</a>...</p>
+
+<div class="container">
+    <h1>Portal Directory</h1>
+    <p>Select a system to continue</p>
+
+    <div class="button-grid">
+        <a href="attendance_portal_FINAL.html" class="nav-button">Attendance Portal</a>
+        <a href="calendar_radnet_styled_FINAL.html" class="nav-button">Radnet Calendar</a>
+        <a href="eod_manager_portalFINAL.html" class="nav-button">EOD Manager Portal</a>
+        <a href="eod_training_dashboard.html" class="nav-button">EOD Training Dashboard</a>
+        <a href="sentimentscanner.html" class="nav-button">Sentiment Scanner</a>
+    </div>
+
+    <div class="footer">
+        Radnet Internal Systems &bull; 2025
+    </div>
+</div>
+
 </body>
 </html>
