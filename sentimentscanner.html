@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
+        #chat-box { width: 100%; height: 100px; padding: 10px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; }
+        .warning { color: #d9534f; font-weight: bold; display: none; margin-top: 10px; }
+        #score-bar { width: 100%; height: 20px; background: #ddd; border-radius: 10px; margin-top: 20px; }
+        #score-fill { width: 100%; height: 100%; background: #5cb85c; border-radius: 10px; transition: 0.3s; }
+        .label { font-size: 12px; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h3>Practice Your Response</h3>
+    <p>Type your response to the customer below. Avoid being defensive.</p>
+    
+    <textarea id="chat-box" placeholder="Type here..." oninput="analyzeText()"></textarea>
+    
+    <div id="warning-msg" class="warning">⚠️ Careful! Avoid using "Actually" or "Policy" – it sounds defensive.</div>
+    
+    <div class="label">Response Quality Meter</div>
+    <div id="score-bar"><div id="score-fill"></div></div>
+
+    <script>
+        const forbidden = ["actually", "policy", "wrong", "calm down", "listen"];
+        
+        function analyzeText() {
+            const text = document.getElementById('chat-box').value.toLowerCase();
+            const warning = document.getElementById('warning-msg');
+            const fill = document.getElementById('score-fill');
+            
+            let found = forbidden.filter(word => text.includes(word));
+            
+            if (found.length > 0) {
+                warning.style.display = "block";
+                fill.style.background = "#d9534f";
+                fill.style.width = (100 - (found.length * 25)) + "%";
+            } else {
+                warning.style.display = "none";
+                fill.style.background = "#5cb85c";
+                fill.style.width = "100%";
+            }
+        }
+    </script>
+</body>
+</html>
