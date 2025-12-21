@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Tracking Portal | RadNet CCC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f1729 0%, #1e3a5f 50%, #2c5282 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .portal-container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 30px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            width: 260px;
+            height: auto;
+        }
+
+        .header-title {
+            border-left: 4px solid #1e3a5f;
+            padding-left: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 2.5rem;
+            color: #1e3a5f;
+            margin-bottom: 5px;
+            font-weight: 900;
+        }
+
+        .header-title p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .stat-pill {
+            background: linear-gradient(135deg, #1e3a5f, #2c5282);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .stat-pill .number {
+            font-size: 2rem;
+            font-weight: 900;
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-pill .label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .search-filter-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 30px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .search-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+
+        .results-count {
+            font-size: 1rem;
+            color: #666;
+            background: #f0f4f8;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 50px 12px 20px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1e3a5f;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 20px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #1e3a5f;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .clear-filters-btn, .location-filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .clear-filters-btn {
+            background: #f0f4f8;
+            color: #1e3a5f;
+        }
+
+        .clear-filters-btn:hover {
+            background: #e0e7ef;
+        }
+
+        .location-filter-btn {
+            background: linear-gradient(135deg, #1e3a5f, #2c5282);
+            color: white;
+        }
+
+        .location-filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+        }
+
+        .location-filter-btn.active {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+
+        .row-future-date {
+            background-color: #fff3e0;
+        }
+
+        .row-future-date:hover {
+            background-color: #ffe0b2;
+        }
+
+        .row-past-date {
+            background-color: #e8f5e9;
+        }
+
+        .row-past-date:hover {
+            background-color: #c8e6c9;
+        }
+
+        .row-terminated {
+            background-color: #ffebee;
+        }
+
+        .row-terminated:hover {
+            background-color: #ffcdd2;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow-x: auto;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1E315A;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            table-layout: auto;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #1E315A 0%, #2c5282 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85em;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        th.sorted-asc::after {
+            content: ' ▲';
+            font-size: 0.7em;
+            margin-left: 5px;
+        }
+
+        th.sorted-desc::after {
+            content: ' ▼';
+            font-size: 0.7em;
+            margin-left: 5px;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.85em;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: all 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.005);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-shipped {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-ordered {
+            background: #e7f3ff;
+            color: #004085;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-terminated {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .complete-checkbox {
+            width: 20px;
+            height: 20px;
+            margin: 0 auto;
+            display: block;
+            cursor: pointer;
+            accent-color: #2196F3;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+        }
+
+        @media (max-width: 1200px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title h1 {
+                font-size: 1.8rem;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th, td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="portal-container">
+        <div class="header">
+            <div class="header-left">
+                <img src="https://github.com/lmoustafa11/imagehost/blob/main/Radnet%20logo%20hi-rescropped.png?raw=true" alt="RadNet Customer Contact Center" class="logo">
+                <div class="header-title">
+                    <h1>Equipment Tracking Portal</h1>
+                    <p>New Hire Equipment Management - Live from Smartsheet</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div class="stat-pill">
+                    <span class="number" id="totalRecordsHeader">0</span>
+                    <span class="label">Records</span>
+                </div>
+                <div class="stat-pill" style="background: linear-gradient(135deg, #10b981, #34d399); cursor: pointer; min-width: 100px;" onclick="manualSync()" title="Click to sync with Smartsheet">
+                    <span class="number" style="font-size: 1.5rem;">🔄</span>
+                    <span class="label">Sync Now</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-filter-section">
+            <div class="search-header">
+                <div>
+                    <h2 class="search-title">🔍 Search Equipment Records</h2>
+                    <div id="lastSyncTime" style="font-size: 0.75rem; color: #999; margin-top: 4px;">Connecting to Smartsheet...</div>
+                </div>
+                <div class="results-count" id="resultsCount">Loading...</div>
+            </div>
+
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput"
+                    placeholder="Search by name, employee ID, location, username..."
+                >
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="filterStatus">Status</label>
+                    <select class="filter-select" id="filterStatus">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Ordered">Ordered</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterTeam">Team</label>
+                    <select class="filter-select" id="filterTeam">
+                    <option value="">All Teams</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterManager">Manager</label>
+                    <select class="filter-select" id="filterManager">
+                    <option value="">All Managers</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterLocation">Location</label>
+                    <select class="filter-select" id="filterLocation">
+                    <option value="">All Locations</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="sortBy">Sort By</label>
+                    <select class="filter-select" id="sortBy">
+                    <option value="date-desc">Start Date (Newest)</option>
+                    <option value="date-asc">Start Date (Oldest)</option>
+                    <option value="name">Agent Name</option>
+                    <option value="expected">Expected Date</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-buttons">
+                <button class="location-filter-btn" id="filterPrides" onclick="filterByLocation('DE')">Prides (DE)</button>
+                <button class="location-filter-btn" id="filterFrederick" onclick="filterByLocation('MD')">Frederick (MD)</button>
+                <button class="location-filter-btn" id="filterRIA" onclick="filterByLocation('FL')">RIA (FL)</button>
+                <button class="clear-filters-btn" id="clearFilters">Clear All Filters</button>
+            </div>
+        </div>
+
+
+
+        <div class="table-container">
+            <div class="loading" id="loadingIndicator">
+                <div class="spinner"></div>
+                <div>Loading equipment data from Smartsheet...</div>
+            </div>
+
+            <div id="errorContainer"></div>
+
+            <table id="dataTable" style="display: none;">
+                <thead>
+                    <tr>
+                    <th onclick="sortTable(0)">Status</th>
+                    <th onclick="sortTable(1)">Agent Name</th>
+                    <th onclick="sortTable(2)">Start Date</th>
+                    <th onclick="sortTable(3)">Manager</th>
+                    <th onclick="sortTable(4)">Team</th>
+                    <th onclick="sortTable(5)">Location</th>
+                    <th onclick="sortTable(6)">Expected Equip. Date</th>
+                    <th onclick="sortTable(7)" style="text-align: center;">Complete</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+
+            <div class="no-data" id="noDataMessage" style="display: none;">
+                <p>📭 No equipment records found matching your filters.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const EMBEDDED_TOKEN = 'HfG7wj4gWeUTwyj4H0nFUvoWvnLHOsuYDD1Kz';
+        const EMBEDDED_SHEET_ID = '219517046181764';
+
+        let db = [];
+        let filteredData = [];
+        let sortDirection = {};
+        let activeLocationFilter = null;
+        let fullSheetData = [];
+        let columnIdMap = {};
+
+        async function syncWithSmartsheet() {
+            if (!EMBEDDED_TOKEN || EMBEDDED_TOKEN === 'YOUR_ACCESS_TOKEN_HERE') {
+                showError('Please configure your Smartsheet access token in the code.');
+                showLoading(false);
+                return;
+            }
+
+            console.log('🔄 Syncing with Smartsheet...');
+            const timestamp = new Date().getTime();
+            let url = `https://corsproxy.io/?` + encodeURIComponent(`https://api.smartsheet.com/2.0/sheets/${EMBEDDED_SHEET_ID}?_=${timestamp}`);
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 
+                    'Authorization': `Bearer ${EMBEDDED_TOKEN}`, 
+                    'Accept': 'application/json' 
+                    }
+                });
+
+                if (!response.ok) throw new Error(`API Error (${response.status})`);
+
+                const data = await response.json();
+                const colMap = {};
+                data.columns.forEach(c => {
+                    colMap[c.id] = c.title;
+                    columnIdMap[c.title] = c.id;
+                });
+
+                fullSheetData = data.rows;
+
+                db = data.rows.map(r => {
+                    const obj = { _rowId: r.id };
+                    r.cells.forEach(cell => {
+                        const columnName = colMap[cell.columnId];
+                        if (columnName) {
+                            obj[columnName] = cell.displayValue || cell.value || '';
+                        }
+                    });
+                    return obj;
+                });
+
+                console.log(`✅ Loaded ${db.length} equipment records from Smartsheet`);
+
+                localStorage.setItem('equipment_data', JSON.stringify(db));
+                const now = new Date();
+                localStorage.setItem('equipment_timestamp', now.toISOString());
+
+                filteredData = [...db];
+                initPortal();
+                updateSyncTimestamp('Last synced: ' + now.toLocaleTimeString());
+
+            } catch (err) {
+                console.error("❌ Smartsheet sync failed:", err);
+
+                const cachedData = localStorage.getItem('equipment_data');
+                if (cachedData) {
+                    console.log('📦 Loading from cache...');
+                    db = JSON.parse(cachedData);
+                    const cacheTime = localStorage.getItem('equipment_timestamp');
+                    const cacheDate = new Date(cacheTime);
+                    updateSyncTimestamp('Using cached data from ' + cacheDate.toLocaleString());
+                } else {
+                    showError('Unable to connect to Smartsheet. Please check your access token and try again.');
+                    updateSyncTimestamp('Sync failed - no cached data available');
+                }
+
+                filteredData = [...db];
+                initPortal();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function updateSyncTimestamp(message) {
+            const element = document.getElementById('lastSyncTime');
+            if (element) {
+                element.textContent = message;
+            }
+        }
+
+        function manualSync() {
+            console.log('🔄 Manual sync triggered...');
+            showLoading(true);
+            hideError();
+            syncWithSmartsheet();
+        }
+
+        function initPortal() {
+            populateFilterOptions();
+            updateStats();
+            renderTable();
+            setupEventListeners();
+        }
+
+        function populateFilterOptions() {
+            const teams = [...new Set(db.map(r => r['Team']).filter(Boolean))].sort();
+            const managers = [...new Set(db.map(r => r['Manager']).filter(Boolean))].sort();
+            const locations = [...new Set(db.map(r => r['Location']).filter(Boolean))].sort();
+
+            populateSelect('filterTeam', teams);
+            populateSelect('filterManager', managers);
+            populateSelect('filterLocation', locations);
+        }
+
+        function populateSelect(selectId, options) {
+            const select = document.getElementById(selectId);
+            const currentValue = select.value;
+
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+
+            select.value = currentValue;
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            const teamFilter = document.getElementById('filterTeam').value;
+            const managerFilter = document.getElementById('filterManager').value;
+            const locationFilter = document.getElementById('filterLocation').value;
+
+            filteredData = db.filter(row => {
+                const matchesSearch = !searchTerm || 
+                    Object.values(row).some(val => 
+                    String(val).toLowerCase().includes(searchTerm)
+                    );
+
+                const matchesStatus = !statusFilter || row['Status'] === statusFilter;
+                const matchesTeam = !teamFilter || row['Team'] === teamFilter;
+                const matchesManager = !managerFilter || row['Manager'] === managerFilter;
+                const matchesLocation = !locationFilter || row['Location'] === locationFilter;
+
+                return matchesSearch && matchesStatus && matchesTeam && matchesManager && matchesLocation;
+            });
+
+            const sortBy = document.getElementById('sortBy').value;
+            sortReports(sortBy);
+
+            updateStats();
+            renderTable();
+        }
+
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            try {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    const year = parseInt(parts[0]);
+                    const month = parseInt(parts[1]) - 1;
+                    const day = parseInt(parts[2]);
+                    return new Date(year, month, day);
+                } else {
+                    return new Date(dateStr);
+                }
+            } catch {
+                return null;
+            }
+        }
+
+        function sortReports(sortBy) {
+            switch(sortBy) {
+                case 'date-desc':
+                default:
+                    filteredData.sort((a, b) => {
+                        const dateA = parseDate(a['Start Date']);
+                        const dateB = parseDate(b['Start Date']);
+                        return dateB - dateA;
+                    });
+                    break;
+                case 'date-asc':
+                    filteredData.sort((a, b) => {
+                        const dateA = parseDate(a['Start Date']);
+                        const dateB = parseDate(b['Start Date']);
+                        return dateA - dateB;
+                    });
+                    break;
+                case 'name':
+                    filteredData.sort((a, b) => (a['Agent Name'] || '').localeCompare(b['Agent Name'] || ''));
+                    break;
+                case 'expected':
+                    filteredData.sort((a, b) => {
+                        const dateA = parseDate(a['Expected Equip. Date']);
+                        const dateB = parseDate(b['Expected Equip. Date']);
+                        return dateA - dateB;
+                    });
+                    break;
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalRecordsHeader').textContent = db.length;
+            document.getElementById('resultsCount').textContent = 
+                `${filteredData.length} record${filteredData.length !== 1 ? 's' : ''} found`;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const table = document.getElementById('dataTable');
+            const noDataMsg = document.getElementById('noDataMessage');
+
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                table.style.display = 'none';
+                noDataMsg.style.display = 'block';
+                return;
+            }
+
+            table.style.display = 'table';
+            noDataMsg.style.display = 'none';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            filteredData.forEach(row => {
+                const tr = document.createElement('tr');
+
+                const status = row['Status'] || '';
+                const statusClass = getStatusClass(status);
+                const agentName = formatAgentName(row['Agent Name'] || '');
+                const managerName = formatManagerName(row['Manager'] || '');
+                const rowId = row._rowId;
+
+                const statusLower = status.toLowerCase();
+                if (statusLower.includes('terminated')) {
+                    tr.classList.add('row-terminated');
+                } else {
+                    const expectedDate = parseDate(row['Expected Equip. Date']);
+                    if (expectedDate) {
+                        expectedDate.setHours(0, 0, 0, 0);
+                        if (expectedDate > today) {
+                            tr.classList.add('row-future-date');
+                        } else {
+                            tr.classList.add('row-past-date');
+                        }
+                    }
+                }
+
+                const isComplete = row['Complete'] === true || row['Complete'] === 'true' || row['Complete'] === 1;
+
+                tr.innerHTML = `
+                    <td><span class="status-badge ${statusClass}">${status || 'N/A'}</span></td>
+                    <td><strong>${agentName}</strong></td>
+                    <td>${formatDate(row['Start Date'])}</td>
+                    <td>${managerName}</td>
+                    <td>${row['Team'] || ''}</td>
+                    <td>${row['Location'] || ''}</td>
+                    <td>${formatDate(row['Expected Equip. Date'])}</td>
+                    <td style="text-align: center;"><input type="checkbox" class="complete-checkbox" ${isComplete ? 'checked' : ''} onchange="handleCheckboxChange(this, '${rowId}')" data-row-id="${rowId}"></td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function handleCheckboxChange(checkbox, rowId) {
+            const isChecked = checkbox.checked;
+            console.log(`Checkbox changed for row ${rowId}: ${isChecked}`);
+
+            const completeColumnId = columnIdMap['Complete'];
+            if (!completeColumnId) {
+                console.error('Complete column not found in column mapping');
+                return;
+            }
+
+            try {
+                const url = `https://corsproxy.io/?` + encodeURIComponent(`https://api.smartsheet.com/2.0/sheets/${EMBEDDED_SHEET_ID}/rows`);
+                const updateData = {
+                    id: parseInt(rowId),
+                    cells: [
+                        {
+                            columnId: parseInt(completeColumnId),
+                            value: isChecked
+                        }
+                    ]
+                };
+
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${EMBEDDED_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify([updateData])
+                });
+
+                if (response.ok) {
+                    console.log('✅ Checkbox updated in Smartsheet');
+
+                    const rowIndex = db.findIndex(r => r._rowId === rowId);
+                    if (rowIndex !== -1) {
+                        db[rowIndex]['Complete'] = isChecked;
+                        localStorage.setItem('equipment_data', JSON.stringify(db));
+                    }
+                } else {
+                    console.error('❌ Failed to update checkbox in Smartsheet');
+                    checkbox.checked = !isChecked;
+                }
+            } catch (err) {
+                console.error('❌ Error updating checkbox:', err);
+                checkbox.checked = !isChecked;
+            }
+        }
+
+        function getStatusClass(status) {
+            const statusLower = status.toLowerCase();
+            if (statusLower.includes('active')) return 'status-active';
+            if (statusLower.includes('terminated')) return 'status-terminated';
+            if (statusLower.includes('deliver')) return 'status-delivered';
+            if (statusLower.includes('ship')) return 'status-shipped';
+            if (statusLower.includes('pending')) return 'status-pending';
+            if (statusLower.includes('order')) return 'status-ordered';
+            if (statusLower.includes('cancel')) return 'status-cancelled';
+            return 'status-pending';
+        }
+
+        function formatAgentName(name) {
+            if (!name) return '';
+            if (name.includes(',')) {
+                const parts = name.split(',').map(p => p.trim());
+                return `${parts[1]} ${parts[0]}`;
+            }
+            return name;
+        }
+
+        function formatManagerName(email) {
+            if (!email) return '';
+            if (email.includes('@')) {
+                const namePart = email.split('@')[0];
+                const parts = namePart.split('.');
+                return parts.map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
+            }
+            return email;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    const year = parseInt(parts[0]);
+                    const month = parseInt(parts[1]) - 1;
+                    const day = parseInt(parts[2]);
+                    const date = new Date(year, month, day);
+                    return date.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                } else {
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                }
+            } catch {
+                return dateStr;
+            }
+        }
+
+        function sortTable(columnIndex) {
+            sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+            const columnNames = ['Status', 'Agent Name', 'Start Date', 'Manager', 
+                    'Team', 'Location', 'Expected Equip. Date', 'Complete'];
+            const columnName = columnNames[columnIndex];
+
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sorted-asc', 'sorted-desc');
+            });
+
+            const headers = document.querySelectorAll('th');
+            if (headers[columnIndex]) {
+                headers[columnIndex].classList.add(sortDirection[columnIndex] ? 'sorted-asc' : 'sorted-desc');
+            }
+
+            filteredData.sort((a, b) => {
+                let aVal = a[columnName] || '';
+                let bVal = b[columnName] || '';
+
+                if (columnName === 'Complete') {
+                    const aComplete = a['Complete'] === true || a['Complete'] === 'true' || a['Complete'] === 1 ? 1 : 0;
+                    const bComplete = b['Complete'] === true || b['Complete'] === 'true' || b['Complete'] === 1 ? 1 : 0;
+                    return sortDirection[columnIndex] ? aComplete - bComplete : bComplete - aComplete;
+                }
+
+                if (columnName.includes('Date')) {
+                    const aDate = parseDate(aVal);
+                    const bDate = parseDate(bVal);
+                    if (aDate && bDate) {
+                        return sortDirection[columnIndex] ? aDate - bDate : bDate - aDate;
+                    }
+                }
+
+                const aNum = parseFloat(aVal);
+                const bNum = parseFloat(bVal);
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return sortDirection[columnIndex] ? aNum - bNum : bNum - aNum;
+                }
+
+                aVal = String(aVal).toLowerCase();
+                bVal = String(bVal).toLowerCase();
+                return sortDirection[columnIndex] ? 
+                    aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            });
+
+            renderTable();
+        }
+
+        function filterByLocation(state) {
+            document.querySelectorAll('.location-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            if (activeLocationFilter === state) {
+                activeLocationFilter = null;
+                document.getElementById('filterLocation').value = '';
+                applyFilters();
+                return;
+            }
+
+            activeLocationFilter = state;
+            const buttonId = state === 'DE' ? 'filterPrides' : state === 'MD' ? 'filterFrederick' : 'filterRIA';
+            document.getElementById(buttonId).classList.add('active');
+
+            document.getElementById('filterLocation').value = state;
+            applyFilters();
+        }
+
+        function clearFilters() {
+            activeLocationFilter = null;
+            document.querySelectorAll('.location-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterTeam').value = '';
+            document.getElementById('filterManager').value = '';
+            document.getElementById('filterLocation').value = '';
+            document.getElementById('sortBy').value = 'date-desc';
+            applyFilters();
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+            if (show) {
+                document.getElementById('dataTable').style.display = 'none';
+                document.getElementById('noDataMessage').style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = `<div class="error-message">⚠️ ${message}</div>`;
+        }
+
+        function hideError() {
+            document.getElementById('errorContainer').innerHTML = '';
+        }
+
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('filterStatus').addEventListener('change', applyFilters);
+            document.getElementById('filterTeam').addEventListener('change', applyFilters);
+            document.getElementById('filterManager').addEventListener('change', applyFilters);
+            document.getElementById('filterLocation').addEventListener('change', applyFilters);
+            document.getElementById('sortBy').addEventListener('change', applyFilters);
+            document.getElementById('clearFilters').addEventListener('click', clearFilters);
+        }
+
+        window.onload = function() {
+            syncWithSmartsheet();
+            setInterval(() => {
+                console.log('🔄 Auto-sync...');
+                syncWithSmartsheet();
+            }, 5 * 60 * 1000);
+        };
+    </script>
+</body>
+</html>

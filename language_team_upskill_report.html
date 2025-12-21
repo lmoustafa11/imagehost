@@ -1,0 +1,847 @@
+undefinedundefined```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Team Upskill Report | RadNet CCC</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f1729 0%, #1e3a5f 50%, #2c5282 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .portal-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            width: 260px;
+            height: auto;
+        }
+
+        .header-title {
+            border-left: 4px solid #1e3a5f;
+            padding-left: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 2.5rem;
+            color: #1e3a5f;
+            margin-bottom: 5px;
+            font-weight: 900;
+        }
+
+        .header-title p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .stat-pill {
+            background: linear-gradient(135deg, #1e3a5f, #2c5282);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .stat-pill .number {
+            font-size: 2rem;
+            font-weight: 900;
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-pill .label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .search-filter-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .search-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+
+        .results-count {
+            font-size: 1rem;
+            color: #666;
+            background: #f0f4f8;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1e3a5f;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 20px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #1e3a5f;
+        }
+
+        .clear-filters-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #f0f4f8;
+            border: none;
+            border-radius: 8px;
+            color: #1e3a5f;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .clear-filters-btn:hover {
+            background: #e0e7ef;
+        }
+
+        .reports-container {
+            display: grid;
+            gap: 16px;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 5px solid #1e3a5f;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .report-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .report-card.expanded {
+            border-left-color: #10b981;
+        }
+
+        /* SUMMARY LAYOUT: EMPLOYEE / STATUS BLOCK / DATES BLOCK / UPSKILL BLOCKS */
+        .report-summary {
+            display: grid;
+            grid-template-columns: 2.4fr 1.6fr 1.8fr 2.2fr 60px;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .report-field { min-width: 0; }
+
+        .report-field-label {
+            font-size: 0.75rem;
+            color: #999;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .report-field-value {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .status-active { background: #d4edda; color: #155724; }
+        .status-terminated { background: #f8d7da; color: #721c24; }
+        .status-leave { background: #fff3cd; color: #856404; }
+        .status-other { background: #e2e3e5; color: #383d41; }
+
+        .expand-icon {
+            font-size: 24px;
+            color: #1e3a5f;
+            transition: transform 0.3s ease;
+            justify-self: end;
+        }
+
+        .report-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .report-details {
+            display: none;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #f0f0f0;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .report-card.expanded .report-details {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .detail-section {
+            background: #f8f9fa;
+            padding: 16px 18px;
+            border-radius: 10px;
+        }
+
+        .detail-section h3 {
+            font-size: 0.95rem;
+            color: #1e3a5f;
+            margin-bottom: 8px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-content {
+            font-size: 0.9rem;
+            color: #333;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .full-width-section {
+            grid-column: 1 / -1;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #e5edf7;
+            color: #1e3a5f;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 2px 4px 2px 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .no-results {
+            background: white;
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-results-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .no-results-text {
+            font-size: 1.3rem;
+            color: #666;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1200px) {
+            .report-summary {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .expand-icon { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="portal-container">
+    <div class="header">
+        <div class="header-left">
+            <img src="https://github.com/lmoustafa11/imagehost/blob/main/Radnet%20logo%20hi-rescropped.png?raw=true"
+                 alt="RadNet Customer Contact Center" class="logo">
+            <div class="header-title">
+                <h1>Language Team Upskill Report</h1>
+                <p>Manager Portal - Live from Smartsheet</p>
+            </div>
+        </div>
+        <div style="display:flex;gap:15px;align-items:center;">
+            <div class="stat-pill">
+                <span class="number" id="totalReportsHeader">0</span>
+                <span class="label">Agents</span>
+            </div>
+            <div class="stat-pill"
+                 style="background:linear-gradient(135deg,#10b981,#34d399);cursor:pointer;min-width:100px;"
+                 onclick="manualSync()" title="Click to sync with Smartsheet">
+                <span class="number" style="font-size:1.5rem;">🔄</span>
+                <span class="label">Sync Now</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-filter-section">
+        <div class="search-header">
+            <div>
+                <h2 class="search-title">🔍 Find Agents</h2>
+                <div id="lastSyncTime"
+                     style="font-size:0.75rem;color:#999;margin-top:4px;">Connecting to Smartsheet...</div>
+            </div>
+            <div class="results-count" id="resultsCount">Loading...</div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput"
+                   placeholder="Search by agent name, employee ID, manager, team, or notes...">
+            <span class="search-icon">🔍</span>
+        </div>
+
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label for="filterTeam">Team</label>
+                <select class="filter-select" id="filterTeam">
+                    <option value="">All Teams</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filterManager">Manager</label>
+                <select class="filter-select" id="filterManager">
+                    <option value="">All Managers</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filterStatus">Status</label>
+                <select class="filter-select" id="filterStatus">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="On Leave">On Leave</option>
+                    <option value="Termed">Termed</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filterBH">BH Upskill</label>
+                <select class="filter-select" id="filterBH">
+                    <option value="">All</option>
+                    <option value="Yes">BH Upskill = Yes</option>
+                    <option value="No">BH Upskill = No</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filterC1">C1 Upskill</label>
+                <select class="filter-select" id="filterC1">
+                    <option value="">All</option>
+                    <option value="Yes">C1 Upskill = Yes</option>
+                    <option value="No">C1 Upskill = No</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="sortBy">Sort By</label>
+                <select class="filter-select" id="sortBy">
+                    <option value="upskill-date">Next Upskill Date</option>
+                    <option value="name">Agent Name</option>
+                    <option value="team">Team</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="clear-filters-btn" id="clearFilters">Clear All Filters</button>
+    </div>
+
+    <div class="reports-container" id="reportsContainer">
+        <div class="loading">Loading upskill data from Smartsheet...</div>
+    </div>
+</div>
+
+<script>
+    const EMBEDDED_TOKEN = 'HfG7wj4gWeUTwyj4H0nFUvoWvnLHOsuYDD1Kz';
+    const EMBEDDED_SHEET_ID = '5341385805746052'; // Language Team Upskill sheet
+
+    let db = [];
+    let filteredReports = [];
+
+    async function syncWithSmartsheet() {
+        if (!EMBEDDED_TOKEN || !EMBEDDED_SHEET_ID) return;
+
+        console.log('🔄 Syncing with Smartsheet (Language Upskill)...');
+        const timestamp = new Date().getTime();
+        const url = 'https://corsproxy.io/?' + encodeURIComponent(
+            `https://api.smartsheet.com/2.0/sheets/${EMBEDDED_SHEET_ID}?_=${timestamp}`
+        );
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${EMBEDDED_TOKEN}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) throw new Error(`API Error (${response.status})`);
+
+            const data = await response.json();
+            const colMap = {};
+            data.columns.forEach(c => { colMap[c.id] = c.title; });
+
+            db = data.rows.map(r => {
+                const obj = {};
+                r.cells.forEach(cell => {
+                    const columnName = colMap[cell.columnId];
+                    if (columnName) {
+                        obj[columnName] = cell.displayValue || cell.value || '';
+                    }
+                });
+                return obj;
+            });
+
+            console.log(`✅ Loaded ${db.length} rows from Language Upskill sheet`);
+
+            localStorage.setItem('language_upskill_data', JSON.stringify(db));
+            const now = new Date();
+            localStorage.setItem('language_upskill_timestamp', now.toISOString());
+
+            filteredReports = [...db];
+            initPortal();
+            updateSyncTimestamp('Last synced: ' + now.toLocaleTimeString());
+        } catch (err) {
+            console.error('❌ Smartsheet sync failed:', err);
+            const cachedData = localStorage.getItem('language_upskill_data');
+            if (cachedData) {
+                console.log('📦 Loading Language Upskill data from cache...');
+                db = JSON.parse(cachedData);
+                const cacheTime = localStorage.getItem('language_upskill_timestamp');
+                if (cacheTime) {
+                    const cacheDate = new Date(cacheTime);
+                    updateSyncTimestamp('Using cached data from ' + cacheDate.toLocaleString());
+                } else {
+                    updateSyncTimestamp('Using cached data (timestamp unavailable)');
+                }
+            } else {
+                updateSyncTimestamp('Sync failed - no cached data available');
+            }
+
+            filteredReports = [...db];
+            initPortal();
+        }
+    }
+
+    function updateSyncTimestamp(message) {
+        const element = document.getElementById('lastSyncTime');
+        if (element) element.textContent = message;
+    }
+
+    function manualSync() {
+        console.log('🔄 Manual sync triggered...');
+        document.getElementById('reportsContainer').innerHTML =
+            '<div class="loading">Syncing with Smartsheet...</div>';
+        syncWithSmartsheet();
+    }
+
+    function initPortal() {
+        populateFilterOptions();
+        applyFilters();
+        setupEventListeners();
+    }
+
+    function populateFilterOptions() {
+        const teams = [...new Set(db.map(r => r['Team']).filter(Boolean))].sort();
+        const managers = [...new Set(db.map(r => r['Manager']).filter(Boolean))].sort();
+
+        populateSelect('filterTeam', teams);
+        populateSelect('filterManager', managers);
+    }
+
+    function populateSelect(selectId, options) {
+        const select = document.getElementById(selectId);
+        const currentOptions = Array.from(select.options).slice(1).map(o => o.value);
+
+        options.forEach(option => {
+            if (!currentOptions.includes(option)) {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            }
+        });
+    }
+
+    function renderReports() {
+        const container = document.getElementById('reportsContainer');
+        document.getElementById('totalReportsHeader').textContent = db.length;
+
+        if (filteredReports.length === 0) {
+            container.innerHTML = `
+                <div class="no-results">
+                    <div class="no-results-icon">📭</div>
+                    <div class="no-results-text">No agents found matching your criteria</div>
+                </div>
+            `;
+            document.getElementById('resultsCount').textContent = '0 agents found';
+            return;
+        }
+
+        container.innerHTML = filteredReports
+            .map((row, index) => createReportCard(row, index))
+            .join('');
+
+        document.getElementById('resultsCount').textContent =
+            `${filteredReports.length} agent${filteredReports.length !== 1 ? 's' : ''} found`;
+    }
+
+    function createStatusClass(statusRaw) {
+        const status = (statusRaw || '').toLowerCase();
+        if (status.includes('term')) return 'status-terminated';
+        if (status.includes('leave')) return 'status-leave';
+        if (status.includes('active')) return 'status-active';
+        return 'status-other';
+    }
+
+    function safe(val, fallback = 'N/A') {
+        return (val && String(val).trim() !== '') ? val : fallback;
+    }
+
+    function hasValue(val) {
+        if (!val) return false;
+        const s = String(val).trim().toUpperCase();
+        return s !== '' && s !== 'N/A';
+    }
+
+    function createReportCard(row, index) {
+        const statusClass = createStatusClass(row['Status']);
+        const upskillDate90 = row['Upskill Date (90 Days)'] || row['Upskill Date'];
+        const bhUpskill = row['BH Upskill'];
+        const bhUpskillDate = row['BH Upskill Date'];
+        const c1Upskill = row['C1 Upskill'];
+        const c1UpskillDate = row['C1 Upskill Date'];
+        const complete = row['Complete'];
+
+        return `
+        <div class="report-card" data-index="${index}" onclick="toggleReport(${index})">
+            <div class="report-summary">
+                <div class="report-field">
+                    <div class="report-field-label">Agent</div>
+                    <div class="report-field-value">
+                        ${safe(row['Agent Name'])}
+                        ${hasValue(row['Employee ID']) ? ` • ${row['Employee ID']}` : ''}
+                    </div>
+                </div>
+
+                <div class="report-field">
+                    <div class="report-field-label">Status / Team / Manager</div>
+                    <div class="report-field-value">
+                        <span class="status-badge ${statusClass}">${safe(row['Status'])}</span>
+                        ${hasValue(row['Team']) ? ` • ${row['Team']}` : ''}
+                        ${hasValue(row['Manager']) ? ` • ${row['Manager']}` : ''}
+                    </div>
+                </div>
+
+                <div class="report-field">
+                    <div class="report-field-label">Key Dates</div>
+                    <div class="report-field-value">
+                        ${hasValue(row['Start Date']) ? `Start: ${row['Start Date']}` : 'Start: N/A'}
+                        ${hasValue(row['Leave Start Date']) ? ` • Leave: ${row['Leave Start Date']}` : ''}
+                        ${hasValue(row['Term Date']) ? ` • Term: ${row['Term Date']}` : ''}
+                    </div>
+                </div>
+
+                <div class="report-field">
+                    <div class="report-field-label">Upskill Snapshot</div>
+                    <div class="report-field-value">
+                        ${hasValue(upskillDate90) ? `90-Day: ${upskillDate90}` : '90-Day: N/A'}
+                        ${hasValue(bhUpskill) ? ` • BH: ${bhUpskill}${hasValue(bhUpskillDate) ? ' (' + bhUpskillDate + ')' : ''}` : ''}
+                        ${hasValue(c1Upskill) ? ` • C1: ${c1Upskill}${hasValue(c1UpskillDate) ? ' (' + c1UpskillDate + ')' : ''}` : ''}
+                        ${hasValue(complete) ? ` • Complete: ${complete}` : ''}
+                    </div>
+                </div>
+
+                <div class="expand-icon">▼</div>
+            </div>
+
+            <div class="report-details">
+                <div class="details-grid">
+                    <div class="detail-section">
+                        <h3><span>📇</span> Agent & Employment</h3>
+                        <div class="detail-content">
+                            <strong>Employee ID:</strong> ${safe(row['Employee ID'])}
+                            \n<strong>Agent Name:</strong> ${safe(row['Agent Name'])}
+                            \n<strong>Status:</strong> ${safe(row['Status'])}
+                            \n<strong>Team:</strong> ${safe(row['Team'])}
+                            \n<strong>Manager:</strong> ${safe(row['Manager'])}
+                            \n<strong>Start Date:</strong> ${safe(row['Start Date'])}
+                            \n<strong>Leave Start Date:</strong> ${safe(row['Leave Start Date'])}
+                            \n<strong>Leave End Date:</strong> ${safe(row['Leave End Date'])}
+                            \n<strong>Term Date:</strong> ${safe(row['Term Date'])}
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3><span>📅</span> Upskill Timeline</h3>
+                        <div class="detail-content">
+                            <strong>90-Day Upskill Date:</strong> ${safe(upskillDate90)}
+                            \n<strong>BH Upskill:</strong> ${safe(bhUpskill)}
+                            \n<strong>BH Upskill Date:</strong> ${safe(bhUpskillDate)}
+                            \n<strong>C1 Upskill:</strong> ${safe(c1Upskill)}
+                            \n<strong>C1 Upskill Date:</strong> ${safe(c1UpskillDate)}
+                            \n<strong>Complete:</strong> ${safe(complete)}
+                        </div>
+                    </div>
+
+                    ${
+                        hasValue(row['Notes']) || hasValue(row['Comments']) ? `
+                        <div class="detail-section full-width-section">
+                            <h3><span>📝</span> Notes / Comments</h3>
+                            <div class="detail-content">
+                                ${hasValue(row['Notes']) ? `<strong>Notes:</strong>\n${row['Notes']}\n` : ''}
+                                ${hasValue(row['Comments']) ? `<strong>Comments:</strong>\n${row['Comments']}` : ''}
+                            </div>
+                        </div>` : ''
+                    }
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    function toggleReport(index) {
+        const card = document.querySelector(`[data-index="${index}"]`);
+        if (card) card.classList.toggle('expanded');
+    }
+
+    function applyFilters() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const team = document.getElementById('filterTeam').value;
+        const manager = document.getElementById('filterManager').value;
+        const status = document.getElementById('filterStatus').value;
+        const bhFilter = document.getElementById('filterBH').value;
+        const c1Filter = document.getElementById('filterC1').value;
+
+        filteredReports = db.filter(row => {
+            if (searchTerm) {
+                const haystack = [
+                    row['Employee ID'],
+                    row['Agent Name'],
+                    row['Manager'],
+                    row['Team'],
+                    row['Status'],
+                    row['Notes'],
+                    row['Comments']
+                ].join(' ').toLowerCase();
+                if (!haystack.includes(searchTerm)) return false;
+            }
+
+            if (team && row['Team'] !== team) return false;
+            if (manager && row['Manager'] !== manager) return false;
+
+            if (status) {
+                const s = (row['Status'] || '').toLowerCase();
+                if (status === 'Active' && !s.includes('active')) return false;
+                if (status === 'On Leave' && !s.includes('leave')) return false;
+                if (status === 'Termed' && !s.includes('term')) return false;
+            }
+
+            if (bhFilter) {
+                const val = (row['BH Upskill'] || '').toString().toLowerCase();
+                if (bhFilter === 'Yes' && val !== 'yes' && val !== 'y' && val !== '1') return false;
+                if (bhFilter === 'No' && (val === 'yes' || val === 'y' || val === '1')) return false;
+            }
+
+            if (c1Filter) {
+                const val = (row['C1 Upskill'] || '').toString().toLowerCase();
+                if (c1Filter === 'Yes' && val !== 'yes' && val !== 'y' && val !== '1') return false;
+                if (c1Filter === 'No' && (val === 'yes' || val === 'y' || val === '1')) return false;
+            }
+
+            return true;
+        });
+
+        const sortBy = document.getElementById('sortBy').value;
+        sortReports(sortBy);
+        renderReports();
+    }
+
+    function sortReports(sortBy) {
+        const parseDate = (val) => {
+            if (!val) return null;
+            const d = new Date(val);
+            return isNaN(d.getTime()) ? null : d;
+        };
+
+        if (sortBy === 'name') {
+            filteredReports.sort((a, b) =>
+                (a['Agent Name'] || '').localeCompare(b['Agent Name'] || '')
+            );
+        } else if (sortBy === 'team') {
+            filteredReports.sort((a, b) =>
+                (a['Team'] || '').localeCompare(b['Team'] || '') ||
+                (a['Agent Name'] || '').localeCompare(b['Agent Name'] || '')
+            );
+        } else if (sortBy === 'upskill-date') {
+            filteredReports.sort((a, b) => {
+                const da = parseDate(a['Upskill Date (90 Days)'] || a['Upskill Date']);
+                const db = parseDate(b['Upskill Date (90 Days)'] || b['Upskill Date']);
+                if (da && db) return da - db;
+                if (da && !db) return -1;
+                if (!da && db) return 1;
+                return 0;
+            });
+        }
+    }
+
+    function clearFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterTeam').value = '';
+        document.getElementById('filterManager').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterBH').value = '';
+        document.getElementById('filterC1').value = '';
+        document.getElementById('sortBy').value = 'upskill-date';
+        applyFilters();
+    }
+
+    function setupEventListeners() {
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('filterTeam').addEventListener('change', applyFilters);
+        document.getElementById('filterManager').addEventListener('change', applyFilters);
+        document.getElementById('filterStatus').addEventListener('change', applyFilters);
+        document.getElementById('filterBH').addEventListener('change', applyFilters);
+        document.getElementById('filterC1').addEventListener('change', applyFilters);
+        document.getElementById('sortBy').addEventListener('change', applyFilters);
+        document.getElementById('clearFilters').addEventListener('click', clearFilters);
+    }
+
+    window.onload = function () {
+        syncWithSmartsheet();
+        setInterval(() => {
+            console.log('🔄 Auto-sync Language Upskill...');
+            syncWithSmartsheet();
+        }, 5 * 60 * 1000);
+    };
+</script>
+</body>
+</html>
+```

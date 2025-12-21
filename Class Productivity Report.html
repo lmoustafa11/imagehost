@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Productivity Report | RadNet CCC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f1729 0%, #1e3a5f 50%, #2c5282 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .portal-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            width: 260px;
+            height: auto;
+        }
+
+        .header-title {
+            border-left: 4px solid #1e3a5f;
+            padding-left: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 2.5rem;
+            color: #1e3a5f;
+            margin-bottom: 5px;
+            font-weight: 900;
+        }
+
+        .header-title p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .stat-pill {
+            background: linear-gradient(135deg, #1e3a5f, #2c5282);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .stat-pill .number {
+            font-size: 2rem;
+            font-weight: 900;
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-pill .label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .search-filter-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .search-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+
+        .results-count {
+            font-size: 1rem;
+            color: #666;
+            background: #f0f4f8;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1e3a5f;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 20px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #1e3a5f;
+        }
+
+        .clear-filters-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #f0f4f8;
+            border: none;
+            border-radius: 8px;
+            color: #1e3a5f;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .clear-filters-btn:hover {
+            background: #e0e7ef;
+        }
+
+        .reports-container {
+            display: grid;
+            gap: 16px;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 5px solid #1e3a5f;
+        }
+
+        .report-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .report-card.expanded {
+            border-left-color: #10b981;
+        }
+
+        .report-summary {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 2fr 80px;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .report-field {
+            min-width: 0;
+        }
+
+        .report-field-label {
+            font-size: 0.75rem;
+            color: #999;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .report-field-value {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .status-on-schedule {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-ahead {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-behind {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .expand-icon {
+            font-size: 24px;
+            color: #1e3a5f;
+            transition: transform 0.3s ease;
+        }
+
+        .report-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .report-details {
+            display: none;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #f0f0f0;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .report-card.expanded .report-details {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .day-grid {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .day-grid.foundation-grid {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .day-grid.service-level-grid {
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: 1fr;
+        }
+
+        .day-cell {
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .day-cell:hover:not(.no-data) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Day 5 with multiple EOW reports */
+        .day-cell.has-eow.has-eow-multi {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.6);
+        }
+
+        .agent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .agent-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #ffff;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .agent-item:hover {
+            background: #e0f2fe;
+            border-color: #38bdf8;
+        }
+
+        .back-to-agents-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .back-to-agents-btn:hover {
+            background: #e2e8f0;
+        }
+
+        /* Foundation Week - LIGHT GREEN */
+        .day-cell.has-eod[data-row-type="F1"],
+        .day-cell.has-eod[data-row-type="F2"] {
+            background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
+            color: white;
+        }
+
+        .day-cell.has-eow[data-row-type="F1"],
+        .day-cell.has-eow[data-row-type="F2"] {
+            background: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
+            color: white;
+        }
+
+        /* Breast Health Week - LIGHT PINK */
+        .day-cell.has-eod[data-row-type="BH"] {
+            background: linear-gradient(135deg, #f9a8d4 0%, #f472b6 100%);
+            color: white;
+        }
+
+        .day-cell.has-eow[data-row-type="BH"] {
+            background: linear-gradient(135deg, #fbcfe8 0%, #f9a8d4 100%);
+            color: white;
+        }
+
+        /* Core 2 Week - LIGHT BLUE */
+        .day-cell.has-eod[data-row-type="C2"] {
+            background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%);
+            color: white;
+        }
+
+        .day-cell.has-eow[data-row-type="C2"] {
+            background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%);
+            color: white;
+        }
+
+        /* Core 1 Week - LIGHT YELLOW */
+        .day-cell.has-eod[data-row-type="C1"] {
+            background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+            color: white;
+        }
+
+        .day-cell.has-eow[data-row-type="C1"] {
+            background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+            color: white;
+        }
+
+        /* RIA Week - LIGHT ORANGE */
+        .day-cell.has-eod[data-row-type="RIA"] {
+            background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
+            color: white;
+        }
+
+        .day-cell.has-eow[data-row-type="RIA"] {
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+            color: white;
+        }
+
+        .day-cell.no-data {
+            background: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .day-cell.selected {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3);
+        }
+
+        .day-number {
+            font-size: 1.3em;
+            margin-bottom: 2px;
+        }
+
+        .day-label {
+            font-size: 0.65em;
+            opacity: 0.9;
+        }
+
+        .detail-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .detail-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #1e3a5f;
+        }
+
+        .close-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .detail-item-label {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .detail-item-value {
+            font-size: 1em;
+            color: #495057;
+        }
+
+        .grid-section-label {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9em;
+            color: #1e3a5f;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: -5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .report-summary {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .expand-icon {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .report-card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="portal-container">
+        <div class="header">
+            <div class="header-left">
+                <img src="https://github.com/lmoustafa11/imagehost/blob/main/Radnet%20logo%20hi-rescropped.png?raw=true" alt="RadNet Customer Contact Center" class="logo">
+                <div class="header-title">
+                    <h1>Class Productivity Report</h1>
+                    <p>Aggregated Training Data - Live from Smartsheet</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div class="stat-pill">
+                    <span class="number" id="totalClasses">0</span>
+                    <span class="label">Classes</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="number" id="totalEOD">0</span>
+                    <span class="label">EOD Reports</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="number" id="totalEOW">0</span>
+                    <span class="label">EOW Reports</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-filter-section">
+            <div class="search-header">
+                <div>
+                    <h2 class="search-title">🔍 Find Classes</h2>
+                    <div id="lastSyncTime" style="font-size: 0.75rem; color: #999; margin-top: 4px;">Connecting to Smartsheet...</div>
+                </div>
+                <div class="results-count" id="resultsCount">Loading...</div>
+            </div>
+
+            <div class="search-box">
+                <input
+                    type="text"
+                    class="search-input"
+                    id="searchInput"
+                    placeholder="Search by Class ID, Trainer, or Status..."
+                >
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="filterCategory">Class Type</label>
+                    <select class="filter-select" id="filterCategory">
+                    <option value="">All Types</option>
+                    <option value="foundation">Foundation</option>
+                    <option value="breast-health">Breast Health</option>
+                    <option value="ria">RIA</option>
+                    <option value="core1">Core 1</option>
+                    <option value="core2">Core 2</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="sortBy">Sort By</label>
+                    <select class="filter-select" id="sortBy">
+                    <option value="date-desc">Date (Newest First)</option>
+                    <option value="date-asc">Date (Oldest First)</option>
+                    <option value="productivity">Productivity (High to Low)</option>
+                    <option value="classId">Class ID (A-Z)</option>
+                    <option value="trainer">Trainer (A-Z)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="clear-filters-btn" id="clearFilters">Clear All Filters</button>
+        </div>
+
+        <div class="reports-container" id="reportsContainer">
+            <div class="loading">Loading data from Smartsheet...</div>
+        </div>
+    </div>
+
+    <script>
+        const EMBEDDED_TOKEN = 'HfG7wj4gWeUTwyj4H0nFUvoWvnLHOsuYDD1Kz';
+        const EOD_SHEET_ID = '5570408476528516';
+        const EOW_SHEET_ID = '5779855099514756';
+
+        let eodData = [];
+        let eowData = [];
+        let aggregatedData = [];
+        let globalClassMap = {};
+        let currentExpandedRow = null;
+
+        // Parse Class ID: MMDDYYTTXX (new) or TTMMDDYYXX (old) -> {date, trainer, classType}
+        function parseClassId(classId) {
+            if (!classId || classId.length < 8) return null;
+
+            try {
+                console.log(`🔍 Parsing Class ID: ${classId}`);
+
+                // Try new format first: MMDDYYTTXX
+                let dateStr = classId.substring(0, 6);
+                let month = dateStr.substring(0, 2);
+                let day = dateStr.substring(2, 4);
+                let year = '20' + dateStr.substring(4, 6);
+
+                let monthNum = parseInt(month);
+                let dayNum = parseInt(day);
+                let yearNum = parseInt(year);
+
+                let isNewFormat = !isNaN(monthNum) && !isNaN(dayNum) && !isNaN(yearNum) &&
+                    monthNum >= 1 && monthNum <= 12 && dayNum >= 1 && dayNum <= 31;
+
+                let trainer = '';
+                let classType = '';
+                let date;
+
+                if (isNewFormat) {
+                    // New format: MMDDYYTTXX
+                    console.log(`   New format detected: ${month}/${day}/${year}`);
+                    date = new Date(`${year}-${month}-${day}`);
+
+                    if (isNaN(date.getTime())) {
+                    console.warn(`Invalid date created from class ID: ${classId}`);
+                    return null;
+                    }
+
+                    const rest = classId.substring(6);
+                    if (rest.length >= 2) {
+                    trainer = rest.substring(0, 2);
+                    classType = rest.substring(2) || '';
+                    } else {
+                    trainer = rest;
+                    classType = '';
+                    }
+                } else {
+                    // Old format: TTMMDDYYXX
+                    console.log(`   Old format detected (trainer first)`);
+                    trainer = classId.substring(0, 2);
+                    month = classId.substring(2, 4);
+                    day = classId.substring(4, 6);
+                    year = '20' + classId.substring(6, 8);
+                    classType = classId.substring(8) || '';
+
+                    console.log(`   Parsed as: trainer=${trainer}, date=${month}/${day}/${year}, type=${classType}`);
+
+                    monthNum = parseInt(month);
+                    dayNum = parseInt(day);
+                    yearNum = parseInt(year);
+
+                    if (isNaN(monthNum) || isNaN(dayNum) || isNaN(yearNum) ||
+                    monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) {
+                    console.warn(`Invalid date in old format class ID: ${classId}`);
+                    return null;
+                    }
+
+                    date = new Date(`${year}-${month}-${day}`);
+
+                    if (isNaN(date.getTime())) {
+                    console.warn(`Invalid date created from old format class ID: ${classId}`);
+                    return null;
+                    }
+                }
+
+                return { date, trainer, classType, dateStr: `${month}/${day}/${year}` };
+            } catch (error) {
+                console.error(`Error parsing class ID ${classId}:`, error);
+                return null;
+            }
+        }
+
+        // Determine if class is Foundation or Service Level
+        function getClassCategory(classType, fullClassId = '') {
+            // Check full Class ID for RIA (old format compatibility)
+            if (fullClassId && fullClassId.toUpperCase().endsWith('RIA')) {
+                return 'ria';
+            }
+
+            if (!classType) return 'unknown';
+            const upper = classType.toUpperCase();
+
+            if (upper.includes('BH') || upper.includes('BREAST')) return 'breast-health';
+            if (upper.includes('RIA')) return 'ria';
+            if (upper.includes('C1')) return 'core1';
+            if (upper.includes('C2') || upper.includes('CORE')) return 'core2';
+            if (upper.endsWith('F') || upper.includes('F1') || upper.includes('F2')) return 'foundation';
+
+            return 'unknown';
+        }
+
+        // Calculate service level date (foundation date + 14 days)
+        function calculateServiceLevelDate(foundationDate) {
+            const serviceLevelDate = new Date(foundationDate);
+            serviceLevelDate.setDate(serviceLevelDate.getDate() + 14);
+            return serviceLevelDate;
+        }
+
+        // Build global class map with all classes
+        function buildGlobalClassMap() {
+            globalClassMap = {};
+
+            // Process EOD data
+            eodData.forEach(row => {
+                const classId = row['Class ID'] || row['Class Id'] || '';
+                if (!classId) return;
+
+                if (!globalClassMap[classId]) {
+                    const parsed = parseClassId(classId);
+                    globalClassMap[classId] = {
+                    classId,
+                    parsed,
+                    category: parsed ? getClassCategory(parsed.classType, classId) : 'unknown',
+                    trainer: row['Trainer'] || '',
+                    created: row['Created'] || row['Created date'] || '',
+                    status: row['Status'] || 'Active',
+                    eodRecords: [],
+                    eowRecords: []
+                    };
+                }
+                globalClassMap[classId].eodRecords.push({ ...row, classId });
+            });
+
+            // Process EOW data
+            eowData.forEach(row => {
+                const classId = row['Class ID'] || row['Class Id'] || '';
+                if (!classId) return;
+
+                if (!globalClassMap[classId]) {
+                    const parsed = parseClassId(classId);
+                    globalClassMap[classId] = {
+                    classId,
+                    parsed,
+                    category: parsed ? getClassCategory(parsed.classType, classId) : 'unknown',
+                    trainer: row['Trainer'] || '',
+                    created: row['Created'] || row['Created date'] || '',
+                    status: row['Status'] || 'Active',
+                    eodRecords: [],
+                    eowRecords: []
+                    };
+                }
+                globalClassMap[classId].eowRecords.push({ ...row, classId });
+            });
+
+            console.log('Global class map built:', globalClassMap);
+        }
+
+        // Link service-level classes to foundation classes
+        function linkServiceLevelClasses() {
+            const allClasses = Object.values(globalClassMap);
+
+            const foundations = allClasses.filter(cls =>
+                cls.category === 'foundation' && cls.parsed
+            );
+
+            const serviceLevels = allClasses.filter(cls =>
+                (cls.category === 'breast-health' || cls.category === 'ria' || cls.category === 'core1' || cls.category === 'core2') && cls.parsed
+            );
+
+            console.log('Foundations:', foundations.map(f => f.classId));
+            console.log('Service Levels:', serviceLevels.map(s => `${s.classId} (${s.category})`));
+
+            foundations.forEach(fnd => {
+                const serviceLevelDate = calculateServiceLevelDate(fnd.parsed.date);
+                const targetDateStr = serviceLevelDate.toISOString().split('T')[0];
+
+                console.log(`Foundation ${fnd.classId} (trainer: ${fnd.trainer}) looking for service level on ${targetDateStr}`);
+
+                function findMatch(levelCategory) {
+                    const sameDate = serviceLevels.filter(sl =>
+                    sl.category === levelCategory &&
+                    sl.parsed.date.toISOString().split('T')[0] === targetDateStr
+                    );
+
+                    let match = sameDate.find(sl => sl.trainer && fnd.trainer && sl.trainer === fnd.trainer);
+                    if (!match) {
+                    match = sameDate[0] || null;
+                    }
+                    return match;
+                }
+
+                const bh = findMatch('breast-health');
+                if (bh) {
+                    fnd.linkedBreastHealthClass = bh;
+                    console.log(`✅ Linked BH: ${fnd.classId} -> ${bh.classId}`);
+                }
+
+                const ria = findMatch('ria');
+                if (ria) {
+                    fnd.linkedRiaClass = ria;
+                    console.log(`✅ Linked RIA: ${fnd.classId} -> ${ria.classId}`);
+                }
+
+                const c1 = findMatch('core1');
+                if (c1) {
+                    fnd.linkedCore1Class = c1;
+                    console.log(`✅ Linked C1: ${fnd.classId} -> ${c1.classId}`);
+                }
+
+                const c2 = findMatch('core2');
+                if (c2) {
+                    fnd.linkedCore2Class = c2;
+                    console.log(`✅ Linked C2: ${fnd.classId} -> ${c2.classId}`);
+                }
+            });
+        }
+
+        // Aggregate data
+        function aggregateData() {
+            buildGlobalClassMap();
+            linkServiceLevelClasses();
+
+            aggregatedData = Object.values(globalClassMap).map(cls => {
+                const eodCount = cls.eodRecords.length;
+                const eowCount = cls.eowRecords.length;
+
+                let totalExpected = 5;
+                if (cls.category === 'foundation') {
+                    totalExpected = 14;
+                }
+
+                const completion = totalExpected > 0 ? Math.round(((eodCount + eowCount) / totalExpected) * 100) : 0;
+                const productivityScore = eodCount + (eowCount * 4);
+
+                return {
+                    classId: cls.classId,
+                    eodRecords: cls.eodRecords,
+                    eowRecords: cls.eowRecords,
+                    created: cls.created,
+                    trainer: cls.trainer,
+                    status: cls.status,
+                    parsed: cls.parsed,
+                    startDate: cls.parsed ? cls.parsed.dateStr : '',
+                    classType: cls.parsed ? cls.parsed.classType : '',
+                    category: cls.category,
+                    eodCount,
+                    eowCount,
+                    completion,
+                    productivityScore,
+                    linkedBreastHealthClass: cls.linkedBreastHealthClass,
+                    linkedCore1Class: cls.linkedCore1Class,
+                    linkedCore2Class: cls.linkedCore2Class,
+                    linkedRiaClass: cls.linkedRiaClass
+                };
+            });
+
+            sortData('date-desc');
+        }
+
+        // Classify EOW records
+        function classifyEowRecord(row) {
+            const serviceLevel = (row['Service Level'] || '').toLowerCase();
+
+            // Foundations Week 1 (Day 5 for Foundations classes)
+            const isF1 =
+                serviceLevel.includes('foundations week 1') ||
+                serviceLevel.includes('foundation week 1') ||
+                serviceLevel.includes('foundations week one') ||
+                serviceLevel.includes('foundation week one');
+            if (isF1) return 'F1';
+
+            // Foundations Week 2 (we'll refine this later if needed)
+            const isF2 =
+                serviceLevel.includes('foundations week 2') ||
+                serviceLevel.includes('foundation week 2') ||
+                serviceLevel.includes('foundations week two') ||
+                serviceLevel.includes('foundation week two');
+            if (isF2) return 'F2';
+
+            if (serviceLevel.includes('breast health')) return 'BH';
+            if (serviceLevel.includes('core 1')) return 'C1';
+            if (serviceLevel.includes('core 2')) return 'C2';
+            if (serviceLevel.includes('ria')) return 'RIA';
+            return 'UNKNOWN';
+        }
+
+        // Calculate expected EOW date (Day 1 + 4 days)
+        function calculateEowDate(startDate) {
+            if (!startDate || isNaN(startDate.getTime())) return null;
+            const eowDate = new Date(startDate);
+            eowDate.setDate(eowDate.getDate() + 4);
+            // Normalize to YYYY-MM-DD for comparison
+            return eowDate.toISOString().split('T')[0];
+        }
+
+        // Normalize Smartsheet date value to YYYY-MM-DD
+        function normalizeSmartsheetDate(value) {
+            if (!value) return null;
+            // If it's already a Date
+            if (value instanceof Date && !isNaN(value.getTime())) {
+                return value.toISOString().split('T')[0];
+            }
+            // If it's a string, try to parse MM/DD/YY or ISO
+            const str = String(value).trim();
+            if (!str) return null;
+
+            // Try ISO first
+            const isoCandidate = new Date(str);
+            if (!isNaN(isoCandidate.getTime())) {
+                return isoCandidate.toISOString().split('T')[0];
+            }
+
+            // Try MM/DD/YY or MM/DD/YYYY
+            const m = str.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+            if (m) {
+                let [_, mm, dd, yy] = m;
+                if (yy.length === 2) yy = '20' + yy;
+                const date = new Date(`${yy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`);
+                if (!isNaN(date.getTime())) {
+                    return date.toISOString().split('T')[0];
+                }
+            }
+
+            return null;
+        }
+
+        // Build EOW lookups: by service level and by date + agent
+        function buildEowLookup(eowRecords) {
+            const lookup = {
+                byServiceLevel: {},
+                byDate: {}
+            };
+
+            eowRecords.forEach(row => {
+                const category = classifyEowRecord(row);
+                if (!lookup.byServiceLevel[category]) lookup.byServiceLevel[category] = [];
+                lookup.byServiceLevel[category].push(row);
+
+                const createdRaw = row['Created'] || row['Created date'] || row['Created Date'];
+                const createdKey = normalizeSmartsheetDate(createdRaw);
+                if (createdKey) {
+                    if (!lookup.byDate[createdKey]) lookup.byDate[createdKey] = [];
+                    lookup.byDate[createdKey].push(row);
+                }
+            });
+
+            return lookup;
+        }
+
+        // Map trainer initials to full names for matching
+        function getTrainerFullNames(initials) {
+            if (!initials) return [];
+            const upper = initials.toUpperCase();
+
+            // Trainer mapping based on Class ID initials
+            const mapping = {
+                'ME': ['espinal', 'melina'],
+                'DB': ['berrios', 'damiana'],
+                'HS': ['simons', 'heather'],
+                'KB': ['benson', 'kezia'],
+                'KF': ['fike', 'kim'],
+                'CM': ['meyer', 'caroline'],
+                'DJ': ['jochsberger', 'david'],
+                'MS': ['sosa', 'melissa'],
+                'KN': ['nelson', 'kashonique'],
+                'ED': ['diener', 'eva'],
+                'AL': ['liska', 'andrea']
+            };
+
+            return mapping[upper] || [];
+        }
+
+        // For Foundations Day 5, get matching EOW reports for a class using global EOW data
+        // This lets us split reports between multiple classes with the same date by Trainer/Support Scheduler
+        function getMatchingEowReportsForClassDay5(targetClass, eowType, expectedEowDate) {
+            if (!targetClass || !expectedEowDate || !eowType) return [];
+
+            // Use GLOBAL EOW data so we can see all reports for that date
+            const globalLookup = buildEowLookup(eowData || []);
+            const byDate = globalLookup.byDate[expectedEowDate] || [];
+
+            // Get trainer initials from the PARSED Class ID (e.g., "DB" from "111725DBF")
+            const trainerInitials = (targetClass.parsed && targetClass.parsed.trainer) || '';
+            const trainerSearchTerms = getTrainerFullNames(trainerInitials);
+
+            const matching = byDate.filter(report => {
+                const reportType = classifyEowRecord(report);
+                if (reportType !== eowType) return false;
+
+                if (!trainerInitials || trainerSearchTerms.length === 0) return true;
+
+                const schedRaw =
+                    report['Trainer/Support Scheduler'] ||
+                    report['Trainer / Support Scheduler'] ||
+                    report['Trainer-Support Scheduler'] ||
+                    report['Trainer Scheduler'] ||
+                    report['Trainer'] ||
+                    '';
+
+                const sched = String(schedRaw).toLowerCase();
+
+                // Check if ANY of the trainer's name parts appear in the scheduler field
+                const hasMatch = trainerSearchTerms.some(term => sched.includes(term));
+
+                return hasMatch;
+            });
+
+            console.log(`📊 getMatchingEowReportsForClassDay5: class=${targetClass.classId}, type=${eowType}, date=${expectedEowDate}, trainer='${trainerInitials}', searchTerms=${JSON.stringify(trainerSearchTerms)}, matches=${matching.length}`);
+
+            return matching;
+        }
+
+        // Calculate expected EOW date for Day 10 (Day 1 + 11 days)
+        function calculateEowDateDay10(startDate) {
+            if (!startDate || isNaN(startDate.getTime())) return null;
+            const eowDate = new Date(startDate);
+            eowDate.setDate(eowDate.getDate() + 11);
+            // Normalize to YYYY-MM-DD for comparison
+            return eowDate.toISOString().split('T')[0];
+        }
+
+        // For Foundations Day 10, get matching EOW reports for a class using global EOW data
+        // This lets us split reports between multiple classes with the same date by Trainer/Support Scheduler
+        function getMatchingEowReportsForClassDay10(targetClass, eowType, expectedEowDate) {
+            if (!targetClass || !expectedEowDate || !eowType) return [];
+
+            // Use GLOBAL EOW data so we can see all reports for that date
+            const globalLookup = buildEowLookup(eowData || []);
+            const byDate = globalLookup.byDate[expectedEowDate] || [];
+
+            // Get trainer initials from the PARSED Class ID (e.g., "DB" from "111725DBF")
+            const trainerInitials = (targetClass.parsed && targetClass.parsed.trainer) || '';
+            const trainerSearchTerms = getTrainerFullNames(trainerInitials);
+
+            const matching = byDate.filter(report => {
+                const reportType = classifyEowRecord(report);
+                if (reportType !== eowType) return false;
+
+                if (!trainerInitials || trainerSearchTerms.length === 0) return true;
+
+                const schedRaw =
+                    report['Trainer/Support Scheduler'] ||
+                    report['Trainer / Support Scheduler'] ||
+                    report['Trainer-Support Scheduler'] ||
+                    report['Trainer Scheduler'] ||
+                    report['Trainer'] ||
+                    '';
+
+                const sched = String(schedRaw).toLowerCase();
+
+                // Check if ANY of the trainer's name parts appear in the scheduler field
+                const hasMatch = trainerSearchTerms.some(term => sched.includes(term));
+
+                return hasMatch;
+            });
+
+            console.log(`📊 getMatchingEowReportsForClassDay10: class=${targetClass.classId}, type=${eowType}, date=${expectedEowDate}, trainer='${trainerInitials}', searchTerms=${JSON.stringify(trainerSearchTerms)}, matches=${matching.length}`);
+
+            return matching;
+        }
+
+        // Build EOD lookup
+        function buildEodByDayLookup(eodRecords) {
+            const lookup = {};
+            eodRecords.forEach(row => {
+                const day = parseInt(row['Day']) || parseInt(row['Day of Class']) || 0;
+                if (!lookup[day]) lookup[day] = [];
+                lookup[day].push(row);
+            });
+            return lookup;
+        }
+
+        // Fetch data from Smartsheet
+        async function fetchSmartsheetData(sheetId) {
+            const timestamp = new Date().getTime();
+            const url = `https://corsproxy.io/?` + encodeURIComponent(`https://api.smartsheet.com/2.0/sheets/${sheetId}?_=${timestamp}`);
+
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${EMBEDDED_TOKEN}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) throw new Error(`API Error (${response.status})`);
+
+            const data = await response.json();
+            const colMap = {};
+            data.columns.forEach(c => {
+                colMap[c.id] = c.title;
+            });
+
+            return data.rows.map(row => {
+                const obj = {};
+                row.cells.forEach(cell => {
+                    const columnName = colMap[cell.columnId];
+                    if (columnName) {
+                    obj[columnName] = cell.displayValue || cell.value || '';
+                    }
+                });
+                return obj;
+            });
+        }
+
+        // Sort data
+        function sortData(sortBy) {
+            switch(sortBy) {
+                case 'date-desc':
+                    aggregatedData.sort((a, b) => {
+                    const dateA = a.parsed ? a.parsed.date : new Date(0);
+                    const dateB = b.parsed ? b.parsed.date : new Date(0);
+                    return dateB - dateA;
+                    });
+                    break;
+                case 'date-asc':
+                    aggregatedData.sort((a, b) => {
+                    const dateA = a.parsed ? a.parsed.date : new Date(0);
+                    const dateB = b.parsed ? b.parsed.date : new Date(0);
+                    return dateA - dateB;
+                    });
+                    break;
+                case 'productivity':
+                    aggregatedData.sort((a, b) => b.productivityScore - a.productivityScore);
+                    break;
+                case 'classId':
+                    aggregatedData.sort((a, b) => a.classId.localeCompare(b.classId));
+                    break;
+                case 'trainer':
+                    aggregatedData.sort((a, b) => a.trainer.localeCompare(b.trainer));
+                    break;
+            }
+        }
+
+        // Filter data
+        function filterData(filterBy) {
+            return aggregatedData.filter(cls => {
+                if (filterBy === '') return true;
+                return cls.category === filterBy;
+            });
+        }
+
+        // Render table
+        function renderTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filterBy = document.getElementById('filterCategory').value;
+
+            let filtered = filterData(filterBy);
+
+            if (searchTerm) {
+                filtered = filtered.filter(cls =>
+                    cls.classId.toLowerCase().includes(searchTerm) ||
+                    cls.trainer.toLowerCase().includes(searchTerm) ||
+                    cls.status.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            const container = document.getElementById('reportsContainer');
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="background: white; border-radius: 12px; padding: 60px 40px; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
+                    <div style="font-size: 64px; margin-bottom: 20px; opacity: 0.3;">📭</div>
+                    <div style="font-size: 1.3rem; color: #666; font-weight: 600;">No classes found matching your criteria</div>
+                    </div>
+                `;
+                updateStats([]);
+                return;
+            }
+
+            container.innerHTML = filtered.map((cls, idx) => createReportCard(cls, idx)).join('');
+            updateStats(filtered);
+        }
+
+        // Create report card
+        function createReportCard(cls, idx) {
+            let linkedInfo = '';
+            if (cls.category === 'foundation') {
+                const linkedCount = (cls.linkedBreastHealthClass ? 1 : 0) + (cls.linkedCore1Class ? 1 : 0) + (cls.linkedCore2Class ? 1 : 0) + (cls.linkedRiaClass ? 1 : 0);
+                if (linkedCount > 0) {
+                    linkedInfo = ` (+${linkedCount} linked)`;
+                }
+            }
+
+            return `
+                <div class="report-card" data-index="${idx}" onclick="toggleDayGrid(${idx})">
+                    <div class="report-summary">
+                    <div class="report-field">
+                    <div class="report-field-label">Class ID / Type</div>
+                    <div class="report-field-value">${cls.classId}${linkedInfo}</div>
+                    </div>
+                    <div class="report-field">
+                    <div class="report-field-label">Start Date</div>
+                    <div class="report-field-value">${cls.startDate}</div>
+                    </div>
+                    <div class="report-field">
+                    <div class="report-field-label">Trainer</div>
+                    <div class="report-field-value">${cls.trainer}</div>
+                    </div>
+                    <div class="expand-icon">▼</div>
+                    </div>
+                    <div class="report-details" id="details-${idx}"></div>
+                </div>
+            `;
+        }
+
+        // Toggle day grid
+        function toggleDayGrid(idx) {
+            const card = document.querySelector(`[data-index="${idx}"]`);
+            const detailsDiv = document.getElementById(`details-${idx}`);
+
+            if (card.classList.contains('expanded')) {
+                card.classList.remove('expanded');
+                detailsDiv.innerHTML = '';
+                currentExpandedRow = null;
+                return;
+            }
+
+            document.querySelectorAll('.report-card').forEach(c => c.classList.remove('expanded'));
+            document.querySelectorAll('.report-details').forEach(d => d.innerHTML = '');
+
+            card.classList.add('expanded');
+            currentExpandedRow = idx;
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filterBy = document.getElementById('filterCategory').value;
+            let filtered = filterData(filterBy);
+            if (searchTerm) {
+                filtered = filtered.filter(cls =>
+                    cls.classId.toLowerCase().includes(searchTerm) ||
+                    cls.trainer.toLowerCase().includes(searchTerm) ||
+                    cls.status.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            const classData = filtered[idx];
+            detailsDiv.innerHTML = renderDayGridForClass(classData);
+            attachDayCellListeners(classData);
+        }
+
+        // Render day grid based on class category
+        function renderDayGridForClass(classData) {
+            console.log(`📊 Rendering grid for ${classData.classId}, category: ${classData.category}`);
+            const isFoundation = classData.category === 'foundation';
+
+            if (isFoundation) {
+                return `
+                    <h3 style="margin-bottom: 15px; color: #1e3a5f;">📅 Training Schedule - ${classData.classId}</h3>
+                    <div class="day-grid foundation-grid">
+                    ${renderFoundationCard(classData)}
+                    </div>
+                    <div id="detailContainer-${classData.classId}"></div>
+                `;
+            } else {
+                const label = classData.category === 'breast-health' ? 'Breast Health Week' : 
+                    classData.category === 'core1' ? 'Core 1 Week' : 
+                    classData.category === 'ria' ? 'RIA Week' : 'Core 2 Week';
+                console.log(`📊 Service level label determined: ${label} for category: ${classData.category}`);
+                return `
+                    <h3 style="margin-bottom: 15px; color: #1e3a5f;">📅 Training Schedule - ${classData.classId}</h3>
+                    <div class="day-grid service-level-grid">
+                    ${renderServiceLevelCard(classData, label)}
+                    </div>
+                    <div id="detailContainer-${classData.classId}"></div>
+                `;
+            }
+        }
+
+        // Render Foundation card
+        function renderFoundationCard(classData) {
+            let html = '';
+
+            html += '<div class="grid-section-label">Foundations Week 1</div>';
+            for (let col = 0; col < 5; col++) {
+                html += renderDayCell(classData, 'F1', col, classData.classId);
+            }
+
+            html += '<div class="grid-section-label">Foundations Week 2</div>';
+            for (let col = 0; col < 5; col++) {
+                html += renderDayCell(classData, 'F2', col, classData.classId);
+            }
+
+            if (classData.linkedBreastHealthClass) {
+                html += '<div class="grid-section-label">Breast Health Week</div>';
+                for (let col = 0; col < 5; col++) {
+                    html += renderDayCell(classData, 'BH', col, classData.linkedBreastHealthClass.classId);
+                }
+            }
+
+            if (classData.linkedCore1Class) {
+                html += '<div class="grid-section-label">Core 1 Week</div>';
+                for (let col = 0; col < 5; col++) {
+                    html += renderDayCell(classData, 'C1', col, classData.linkedCore1Class.classId);
+                }
+            }
+
+            if (classData.linkedCore2Class) {
+                html += '<div class="grid-section-label">Core 2 Week</div>';
+                for (let col = 0; col < 5; col++) {
+                    html += renderDayCell(classData, 'C2', col, classData.linkedCore2Class.classId);
+                }
+            }
+
+            if (classData.linkedRiaClass) {
+                html += '<div class="grid-section-label">RIA Week</div>';
+                for (let col = 0; col < 5; col++) {
+                    html += renderDayCell(classData, 'RIA', col, classData.linkedRiaClass.classId);
+                }
+            }
+
+            return html;
+        }
+
+        // Render Service Level card
+        function renderServiceLevelCard(classData, label) {
+            let html = '';
+            let rowType;
+            let effectiveLabel = label;
+
+            if (classData.category === 'breast-health') {
+                rowType = 'BH';
+                effectiveLabel = 'Breast Health Week';
+            } else if (classData.category === 'core1') {
+                rowType = 'C1';
+                effectiveLabel = 'Core 1 Week';
+            } else if (classData.category === 'ria') {
+                rowType = 'RIA';
+                effectiveLabel = 'RIA Week';
+            } else {
+                rowType = 'C2';
+                effectiveLabel = 'Core 2 Week';
+            }
+
+            html += `<div class="grid-section-label">${effectiveLabel}</div>`;
+            for (let col = 0; col < 5; col++) {
+                html += renderDayCell(classData, rowType, col, classData.classId);
+            }
+
+            return html;
+        }
+
+        // Render individual day cell
+        function renderDayCell(classData, rowType, columnIndex, targetClassId) {
+            let eodDay;
+            let displayDay;
+
+            if (rowType === 'F1') {
+                eodDay = columnIndex + 1;
+                displayDay = columnIndex + 1;
+            } else if (rowType === 'F2') {
+                eodDay = columnIndex + 6;
+                displayDay = columnIndex + 6;
+            } else if (rowType === 'BH' || rowType === 'C1' || rowType === 'C2' || rowType === 'RIA') {
+                eodDay = columnIndex + 1;
+                displayDay = (classData.category === 'foundation') ? columnIndex + 11 : columnIndex + 1;
+            }
+
+            const targetClass = globalClassMap[targetClassId];
+            if (!targetClass) {
+                return `<div class="day-cell no-data"><div class="day-number">${displayDay}</div><div class="day-label">EOD</div></div>`;
+            }
+
+            const eodLookup = buildEodByDayLookup(targetClass.eodRecords);
+            const eowLookup = buildEowLookup(targetClass.eowRecords);
+
+            const hasEod = eodLookup[eodDay] && eodLookup[eodDay].length > 0;
+
+            let hasEow = false;
+            let eowType = null;
+            let hasMultiEow = false;
+            let eowDateKey = null;
+
+            if (columnIndex === 4) {
+                eowType = rowType;
+
+                // For F2 at columnIndex 4, this is Day 10 (not Day 5)
+                if (rowType === 'F2') {
+                    // Day 10 logic: Calculate expected EOW date for Day 10 (start date + 11 days)
+                    const startDate = targetClass.parsed ? targetClass.parsed.date : null;
+                    const expectedEowDate = calculateEowDateDay10(startDate);
+
+                    if (expectedEowDate) {
+                        eowDateKey = expectedEowDate;
+
+                        // For Foundation Day 10, use GLOBAL EOW data + Trainer/Support Scheduler to split between classes
+                        const matchingReports = getMatchingEowReportsForClassDay10(targetClass, eowType, expectedEowDate);
+
+                        hasEow = matchingReports.length > 0;
+                        hasMultiEow = matchingReports.length > 1;
+
+                        console.log(`📅 Day 10 check for ${targetClassId} (${eowType}): Expected date=${expectedEowDate}, Found ${matchingReports.length} matching EOW reports`);
+                    }
+                } else {
+                    // Day 5 logic for F1 and all other service-level classes
+                    // Calculate expected EOW date (start date + 4 days)
+                    const startDate = targetClass.parsed ? targetClass.parsed.date : null;
+                    const expectedEowDate = calculateEowDate(startDate);
+
+                    if (expectedEowDate) {
+                        eowDateKey = expectedEowDate;
+
+                        let matchingReports;
+
+                        // For Foundation Week 1, use GLOBAL EOW data + Trainer/Support Scheduler to split between classes
+                        if (rowType === 'F1') {
+                        matchingReports = getMatchingEowReportsForClassDay5(targetClass, eowType, expectedEowDate);
+                        } else {
+                        // For service-level weeks, keep using the class-specific EOW records
+                        const byDate = eowLookup.byDate[expectedEowDate] || [];
+                        matchingReports = byDate.filter(report => {
+                        const reportType = classifyEowRecord(report);
+                        return reportType === eowType;
+                        });
+                        }
+
+                        hasEow = matchingReports.length > 0;
+                        hasMultiEow = matchingReports.length > 1;
+
+                        console.log(`📅 Day 5 check for ${targetClassId} (${eowType}): Expected date=${expectedEowDate}, Found ${matchingReports.length} matching EOW reports`);
+                    }
+                }
+            }
+
+            let cellClass = 'day-cell no-data';
+            let label = 'EOD';
+
+            if (hasEow) {
+                cellClass = hasMultiEow ? 'day-cell has-eow has-eow-multi' : 'day-cell has-eow';
+                label = hasMultiEow ? 'EOW (Multi)' : 'EOW';
+            } else if (hasEod) {
+                cellClass = 'day-cell has-eod';
+            }
+
+            return `
+                <div class="${cellClass}" 
+                    data-day="${eodDay}" 
+                    data-eow-type="${eowType || ''}" 
+                    data-row-type="${rowType}"
+                    data-class-id="${targetClassId}"
+                    data-eow-date="${eowDateKey || ''}">
+                    <div class="day-number">${displayDay}</div>
+                    <div class="day-label">${label}</div>
+                </div>
+            `;
+        }
+
+        // Attach event listeners to day cells
+        function attachDayCellListeners(classData) {
+            const cells = document.querySelectorAll('.day-cell');
+            cells.forEach(cell => {
+                if (!cell.classList.contains('no-data')) {
+                    cell.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    handleDayCellClick(cell, classData);
+                    });
+                }
+            });
+        }
+
+        // Handle day cell click
+        function handleDayCellClick(cell, classData) {
+            document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+            cell.classList.add('selected');
+
+            const day = parseInt(cell.dataset.day);
+            const eowType = cell.dataset.eowType;
+            const targetClassId = cell.dataset.classId;
+            const eowDateKey = cell.dataset.eowDate;
+
+            console.log(`📅 Day cell clicked: Day ${day}, EOW Type: ${eowType}, Class: ${targetClassId}, EOW Date: ${eowDateKey}`);
+
+            const targetClass = globalClassMap[targetClassId];
+            if (!targetClass) {
+                console.warn(`⚠️ Target class ${targetClassId} not found in globalClassMap`);
+                return;
+            }
+
+            const detailContainer = document.getElementById(`detailContainer-${classData.classId}`);
+
+            // Day 5 with potential multiple EOW reports
+            if (eowType && day === 5 && eowDateKey) {
+                let matchingReports;
+
+                if (eowType === 'F1' || eowType === 'F2') {
+                    // For Foundations, use GLOBAL EOW data + Trainer/Support Scheduler to split between classes
+                    matchingReports = getMatchingEowReportsForClassDay5(targetClass, eowType, eowDateKey);
+
+                    console.log(`📊 Day 5 EOW lookup (FOUNDATION) for ${eowType}:`, {
+                    eowDateKey,
+                    totalGlobalEowRecords: eowData.length,
+                    classId: targetClassId,
+                    trainer: targetClass.trainer,
+                    matchingReports: matchingReports.length
+                    });
+                } else {
+                    // For service-level weeks, keep using the class-specific EOW records
+                    const eowLookup = buildEowLookup(targetClass.eowRecords);
+                    console.log(`📊 Day 5 EOW lookup for ${eowType}:`, {
+                    eowDateKey,
+                    totalEowRecords: targetClass.eowRecords.length,
+                    byServiceLevel: Object.keys(eowLookup.byServiceLevel),
+                    byDate: Object.keys(eowLookup.byDate)
+                    });
+
+                    // Get all EOW reports created on the expected date
+                    const byDate = eowLookup.byDate[eowDateKey] || [];
+                    console.log(`   Date-based lookup (${eowDateKey}): ${byDate.length} records`);
+
+                    // Filter by service level matching the row type
+                    matchingReports = byDate.filter(report => {
+                    const reportType = classifyEowRecord(report);
+                    return reportType === eowType;
+                    });
+
+                    console.log(`   Filtered by service level (${eowType}): ${matchingReports.length} matching records`);
+                }
+
+                if (matchingReports.length > 0) {
+                    detailContainer.innerHTML = renderEowAgentList(day, eowType, eowDateKey, matchingReports, classData.classId);
+                    attachAgentClickHandlers(day, eowType, eowDateKey, matchingReports, classData.classId);
+                    return;
+                }
+
+                console.warn(`⚠️ No EOW records found for Day 5, type ${eowType}, date ${eowDateKey}`);
+            }
+
+            // Day 10 with potential multiple EOW reports
+            if (eowType && day === 10 && eowDateKey) {
+                let matchingReports;
+
+                if (eowType === 'F2') {
+                    // For Foundation Week 2 Day 10, use GLOBAL EOW data + Trainer/Support Scheduler to split between classes
+                    matchingReports = getMatchingEowReportsForClassDay10(targetClass, eowType, eowDateKey);
+
+                    console.log(`📊 Day 10 EOW lookup (FOUNDATION) for ${eowType}:`, {
+                    eowDateKey,
+                    totalGlobalEowRecords: eowData.length,
+                    classId: targetClassId,
+                    trainer: targetClass.trainer,
+                    matchingReports: matchingReports.length
+                    });
+                }
+
+                if (matchingReports && matchingReports.length > 0) {
+                    detailContainer.innerHTML = renderEowAgentList(day, eowType, eowDateKey, matchingReports, classData.classId);
+                    attachAgentClickHandlers(day, eowType, eowDateKey, matchingReports, classData.classId);
+                    return;
+                }
+
+                console.warn(`⚠️ No EOW records found for Day 10, type ${eowType}, date ${eowDateKey}`);
+            }
+
+            if (eowType) {
+                const eowLookup = buildEowLookup(targetClass.eowRecords);
+                const byService = eowLookup.byServiceLevel[eowType] || [];
+
+                if (byService.length > 0) {
+                    detailContainer.innerHTML = renderEowDetail(day, eowType, byService[0]);
+                }
+            } else {
+                const eodLookup = buildEodByDayLookup(targetClass.eodRecords);
+                const eodRecords = eodLookup[day];
+
+                if (eodRecords && eodRecords.length > 0) {
+                    detailContainer.innerHTML = renderEodDetail(day, eodRecords[0]);
+                }
+            }
+
+            const closeBtn = detailContainer.querySelector('.close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    detailContainer.innerHTML = '';
+                    document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+                });
+            }
+        }
+
+        // Render list of agents for EOW (Day 5)
+        function renderEowAgentList(day, eowType, eowDateKey, records, classId) {
+            // Group by agent name
+            const byAgent = {};
+            records.forEach(rec => {
+                const agent = rec['Agent'] || rec['Agent Name'] || rec['Trainee'] || 'Unknown Agent';
+                if (!byAgent[agent]) byAgent[agent] = [];
+                byAgent[agent].push(rec);
+            });
+
+            const typeLabels = {
+                'F1': 'Foundations Week One',
+                'F2': 'Foundations Week Two',
+                'BH': 'Breast Health',
+                'C1': 'Core 1',
+                'C2': 'Core 2',
+                'RIA': 'RIA'
+            };
+
+            const agentsHtml = Object.entries(byAgent).map(([agent, recs], idx) => {
+                const countLabel = recs.length > 1 ? ` (${recs.length} reports)` : '';
+                return `
+                    <button class="agent-item" 
+                    data-agent-index="${idx}" 
+                    data-agent-name="${agent}">
+                    👤 ${agent}${countLabel}
+                    </button>
+                `;
+            }).join('');
+
+            return `
+                <div class="detail-card">
+                    <div class="detail-header">
+                    <div class="detail-title">📊 Day ${day} - ${typeLabels[eowType] || 'Service Level'} EOW Reports (${eowDateKey})</div>
+                    <button class="close-btn">Close</button>
+                    </div>
+                    <div class="detail-grid">
+                    <div class="detail-item" style="grid-column: 1 / -1;">
+                    <div class="detail-item-label">Agents</div>
+                    <div class="detail-item-value agent-list">
+                    ${agentsHtml || 'No agents found'}
+                    </div>
+                    </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Attach click handlers to agent buttons
+        function attachAgentClickHandlers(day, eowType, eowDateKey, records, classId) {
+            const detailContainer = document.getElementById(`detailContainer-${classId}`);
+            const buttons = detailContainer.querySelectorAll('.agent-item');
+
+            // Rebuild agent grouping to keep index mapping
+            const byAgent = {};
+            records.forEach(rec => {
+                const agent = rec['Agent'] || rec['Agent Name'] || rec['Trainee'] || 'Unknown Agent';
+                if (!byAgent[agent]) byAgent[agent] = [];
+                byAgent[agent].push(rec);
+            });
+            const agentEntries = Object.entries(byAgent);
+
+            buttons.forEach((btn, idx) => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    const [agentName, agentRecs] = agentEntries[idx] || [];
+                    if (agentRecs && agentRecs.length > 0) {
+                    // For now, show the first report for that agent on that date
+                    detailContainer.innerHTML = renderEowDetailForAgent(day, eowType, agentName, agentRecs[0], eowDateKey, classId, agentEntries);
+                    attachBackToAgentListHandler(day, eowType, eowDateKey, records, classId);
+                    }
+                });
+            });
+
+            const closeBtn = detailContainer.querySelector('.close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    detailContainer.innerHTML = '';
+                    document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+                });
+            }
+        }
+
+        // Render EOW detail for a specific agent
+        function renderEowDetailForAgent(day, eowType, agentName, record, eowDateKey, classId, agentEntries) {
+            const typeLabels = {
+                'F1': 'Foundations Week One',
+                'F2': 'Foundations Week Two',
+                'BH': 'Breast Health',
+                'C1': 'Core 1',
+                'C2': 'Core 2',
+                'RIA': 'RIA'
+            };
+
+            return `
+                <div class="detail-card">
+                    <div class="detail-header">
+                    <div class="detail-title">📊 Day ${day} - ${typeLabels[eowType] || 'Service Level'} EOW Report for ${agentName}</div>
+                    <button class="close-btn">Close</button>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                    <button class="back-to-agents-btn">← Back to Agent List</button>
+                    <div style="font-size: 0.85em; color: #6c757d; margin-top: 4px;">EOW Date: ${eowDateKey}</div>
+                    </div>
+                    <div class="detail-grid">
+                    ${renderRecordKeyValues(record)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Attach handler for back button
+        function attachBackToAgentListHandler(day, eowType, eowDateKey, records, classId) {
+            const detailContainer = document.getElementById(`detailContainer-${classId}`);
+            const backBtn = detailContainer.querySelector('.back-to-agents-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    detailContainer.innerHTML = renderEowAgentList(day, eowType, eowDateKey, records, classId);
+                    attachAgentClickHandlers(day, eowType, eowDateKey, records, classId);
+                });
+            }
+
+            const closeBtn = detailContainer.querySelector('.close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    detailContainer.innerHTML = '';
+                    document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+                });
+            }
+        }
+
+        // Render EOD detail
+        function renderEodDetail(day, record) {
+            return `
+                <div class="detail-card">
+                    <div class="detail-header">
+                    <div class="detail-title">📋 Day ${day} - End of Day Report</div>
+                    <button class="close-btn">Close</button>
+                    </div>
+                    <div class="detail-grid">
+                    ${renderRecordKeyValues(record)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render EOW detail
+        function renderEowDetail(day, eowType, record) {
+            const typeLabels = {
+                'F1': 'Foundations Week One',
+                'F2': 'Foundations Week Two',
+                'BH': 'Breast Health',
+                'C1': 'Core 1',
+                'C2': 'Core 2',
+                'RIA': 'RIA'
+            };
+
+            return `
+                <div class="detail-card">
+                    <div class="detail-header">
+                    <div class="detail-title">📊 Day ${day} - ${typeLabels[eowType]} Report</div>
+                    <button class="close-btn">Close</button>
+                    </div>
+                    <div class="detail-grid">
+                    ${renderRecordKeyValues(record)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render record key-value pairs
+        function renderRecordKeyValues(record) {
+            return Object.entries(record)
+                .filter(([key]) => !['classId'].includes(key))
+                .map(([key, value]) => `
+                    <div class="detail-item">
+                    <div class="detail-item-label">${key}</div>
+                    <div class="detail-item-value">${value || 'N/A'}</div>
+                    </div>
+                `).join('');
+        }
+
+        // Update stats
+        function updateStats(data) {
+            document.getElementById('totalClasses').textContent = data.length;
+            document.getElementById('totalEOD').textContent = data.reduce((sum, cls) => sum + (cls.eodCount || 0), 0);
+            document.getElementById('totalEOW').textContent = data.reduce((sum, cls) => sum + (cls.eowCount || 0), 0);
+            document.getElementById('resultsCount').textContent = `${data.length} class${data.length !== 1 ? 'es' : ''} found`;
+        }
+
+        // Initialize
+        async function init() {
+            try {
+                console.log('🔄 Syncing with Smartsheet...');
+                eodData = await fetchSmartsheetData(EOD_SHEET_ID);
+                eowData = await fetchSmartsheetData(EOW_SHEET_ID);
+
+                console.log(`✅ Loaded ${eodData.length} EOD and ${eowData.length} EOW reports`);
+
+                aggregateData();
+                renderTable();
+
+                document.getElementById('lastSyncTime').textContent = 'Last synced: ' + new Date().toLocaleTimeString();
+
+                document.getElementById('searchInput').addEventListener('input', renderTable);
+                document.getElementById('sortBy').addEventListener('change', (e) => {
+                    sortData(e.target.value);
+                    renderTable();
+                });
+                document.getElementById('filterCategory').addEventListener('change', renderTable);
+                document.getElementById('clearFilters').addEventListener('click', () => {
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('filterCategory').value = '';
+                    document.getElementById('sortBy').value = 'date-desc';
+                    sortData('date-desc');
+                    renderTable();
+                });
+            } catch (error) {
+                console.error('❌ Error:', error);
+                document.getElementById('reportsContainer').innerHTML = `<div class="loading" style="color: #ff6b6b;">Error loading data: ${error.message}</div>`;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
