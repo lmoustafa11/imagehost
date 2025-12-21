@@ -3,60 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Management & Training Hub</title>
+    <title>RadNet Training Resource Hub</title>
     <style>
-        :root {
-            --primary-color: #1E315A; /* Radnet Blue */
-            --secondary-color: #007bff;
-            --bg-color: #f8f9fa;
-        }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
-        h1 { color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.8rem; }
-        p { color: #666; margin-bottom: 2rem; }
-        
-        .button-grid { display: flex; flex-direction: column; gap: 12px; }
-        
-        .nav-button {
-            display: block;
-            padding: 15px 20px;
-            background-color: white;
-            color: var(--primary-color);
-            text-decoration: none;
-            border: 2px solid var(--primary-color);
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-        
-        .nav-button:hover {
-            background-color: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(30, 49, 90, 0.2);
-        }
-
-        .footer { margin-top: 2rem; font-size: 0.8rem; color: #aaa; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; overflow-x: hidden; position: relative; }
+        .background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(45deg, #1E315A, #2c4a7c, #1E315A, #3d5a8f); background-size: 400% 400%; animation: gradientShift 8s ease infinite; }
+        .circle { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.05); animation: float 12s infinite ease-in-out; }
+        .circle:nth-child(1) { width: 300px; height: 300px; top: 10%; left: 10%; animation-delay: 0s; }
+        .circle:nth-child(2) { width: 200px; height: 200px; top: 60%; right: 15%; animation-delay: 3s; }
+        .circle:nth-child(3) { width: 150px; height: 150px; bottom: 20%; left: 20%; animation-delay: 6s; }
+        .circle:nth-child(4) { width: 250px; height: 250px; top: 40%; right: 30%; animation-delay: 9s; }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; } 50% { transform: translate(30px, -30px) scale(1.1); opacity: 0.5; } }
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 1; }
+        .header { text-align: center; margin-bottom: 50px; animation: fadeInDown 1s ease; }
+        .logo { max-width: 500px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); }
+        .header h1 { color: white; font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }
+        .header p { color: rgba(255, 255, 255, 0.9); font-size: 1.2em; }
+        .resource-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 40px; }
+        .resource-card { background: rgba(255, 255, 255, 0.95); border-radius: 15px; padding: 30px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; cursor: pointer; animation: fadeInUp 0.8s ease; position: relative; overflow: hidden; }
+        .resource-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(30, 49, 90, 0.1), transparent); transition: left 0.5s ease; }
+        .resource-card:hover::before { left: 100%; }
+        .resource-card:hover { transform: translateY(-10px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3); }
+        .resource-card h2 { color: #1E315A; font-size: 1.5em; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .icon { font-size: 1.8em; }
+        .resource-card p { color: #555; line-height: 1.6; margin-bottom: 20px; }
+        .btn { display: inline-block; background: #1E315A; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; transition: all 0.3s ease; font-weight: 600; }
+        .btn:hover { background: #2c4a7c; transform: scale(1.05); }
+        .category-section { margin-bottom: 50px; }
+        .category-title { color: white; font-size: 2em; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 3px solid rgba(255, 255, 255, 0.3); text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .header h1 { font-size: 1.8em; } .resource-grid { grid-template-columns: 1fr; } .logo { max-width: 300px; } }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>Portal Directory</h1>
-    <p>Select a system to continue</p>
-
-    <div class="button-grid">
-        <a href="attendance_portal_FINAL.html" class="nav-button">Attendance Portal</a>
-        <a href="calendar_radnet_styled_FINAL.html" class="nav-button">Radnet Calendar</a>
-        <a href="eod_manager_portalFINAL.html" class="nav-button">EOD Manager Portal</a>
-        <a href="eod_training_dashboard.html" class="nav-button">EOD Training Dashboard</a>
-        <a href="sentimentscanner.html" class="nav-button">Sentiment Scanner</a>
+    <div class="background">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
     </div>
 
-    <div class="footer">
-        Radnet Internal Systems &bull; 2025
-    </div>
-</div>
+    <div class="container">
+        <div class="header">
+            <img src="https://raw.githubusercontent.com/lmoustafa11/imagehost/main/radnetlogo%20transparent%20bluehue-1E315A.png" alt="RadNet Logo" class="logo">
+            <h1>Training Resource Hub</h1>
+            <p>Customer Contact Center - Trainer Resources</p>
+        </div>
 
+        <!-- Manager Portals Section -->
+        <div class="category-section">
+            <h2 class="category-title">📊 Manager Portals</h2>
+            <div class="resource-grid">
+                <div class="resource-card" onclick="window.open('https://lmoustafa11.github.io/imagehost/eod_manager_portalFINAL.html', '_blank')">
+                    <h2><span class="icon">📋</span>EOD Manager Portal</h2>
+                    <p>End-of-day manager dashboard for tracking training progress, class completion, and team performance metrics.</p>
+                    <a href="https://lmoustafa11.github.io/imagehost/eod_manager_portalFINAL.html" class="btn" target="_blank">Open Portal</a>
+                </div>
+
+                <div class="resource-card" onclick="window.open('https://lmoustafa11.github.io/imagehost/eow_manager_portal.html', '_blank')">
+                    <h2><span class="icon">📅</span>EOW Manager Portal</h2>
+                    <p>End-of-week manager overview for weekly training summaries and performance analysis.</p>
+                    <a href="https://lmoustafa11.github.io/imagehost/eow_manager_portal.html" class="btn" target="_blank">Open Portal</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Dashboards Section -->
+        <div class="category-section">
+            <h2 class="category-title">📈 Training Dashboards</h2>
+            <div class="resource-grid">
+                <div class="resource-card" onclick="window.open('https://lmoustafa11.github.io/imagehost/eod_training_dashboard.html', '_blank')">
+                    <h2><span class="icon">📊</span>EOD Training Dashboard</h2>
+                    <p>Daily training metrics and progress tracking for individual classes and trainees.</p>
+                    <a href="https://lmoustafa11.github.io/imagehost/eod_training_dashboard.html" class="btn" target="_blank">Open Dashboard</a>
+                </div>
+
+                <div class="resource-card" onclick="window.open('https://lmoustafa11.github.io/imagehost/Class%20Productivity%20Report.html?rw=true', '_blank')">
+                    <h2><span class="icon">📊</span>Class Productivity Report</h2>
+                    <p>Comprehensive productivity analysis and performance metrics for training classes.</p>
+                    <a href="https://lmoustafa11.github.io/imagehost/Class%20Productivity%20Report.html?rw=true" class="btn" target="_blank">Open Report</a>
+                </div>
+
+                <div class="resource-card" onclick="window.open('https://lmoustafa11.github.io/imagehost/language_team_upskill_report.html', '_blank')">
+                    <h2><span class="icon">🌐</span>Language Team Upskill Report</h2>
+                    <p>Track language team training progress and upskilling initiatives.</p>
+                    <a href="https://lmoustafa11.github.io/imagehost/language_team_upskill_report.html" class="btn" target="_blank">Open Report</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracking Portals Section -->
+        <div class="category-section">
+            <h2 class="category-title">🔍 Tracking Portals</h2>
+            <div class="resource-grid">
+                <div class="resource-card" onclick="window.open('https://lmoustafa11.github.io/imagehost/attendance_portal_FINAL.html', '_blank')">
+                    <h2><span class="icon">✅</span>Attendance Portal</h2>
+                    <p>Monitor and manage trainee attendance records and participation tracking.</p>
+                    <a href="https://lmoustafa11.github.io/imagehost/attendance_portal_FINAL.html" class="btn" target="_blank">Open Portal</a>
+                </div>
+
+                <div class="resource-card" onclick="window.open('https://lmoustafa11.github.io/imagehost/Equipment%20Tracking%20Portal.html', '_blank')">
+                    <h2><span class="icon">💻</span>Equipment Tracking Portal</h2>
+                    <p>Track and manage training equipment assignments and availability.</p>
+                    <a href="https://lmoustafa11.github.io/imagehost/Equipment%20Tracking%20Portal.html" class="btn" target="_blank">Open Portal</a>
+                </div>
+
+                <div class="resource-card" onclick="window.open('https://lmoustafa11.github.io/imagehost/calendar_radnet_styled_FINAL.html', '_blank')">
+                    <h2><span class="icon">📆</span>Training Calendar</h2>
+                    <p>View and manage training schedules, class timings, and important dates.</p>
+                    <a href="https://lmoustafa11.github.io/imagehost/calendar_radnet_styled_FINAL.html" class="btn" target="_blank">Open Calendar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Concept Activities Section -->
+        <div class="category-section">
+            <h2 class="category-title">🎯 Concept Activities</h2>
+            <div class="resource-grid">
+                <div class="resource-card" onclick="window.open('https://lmoustafa11.github.io/imagehost/avdmriexamconcept.html', '_blank')">
+                    <h2><span class="icon">🧠</span>Advanced MRI Exam Concept</h2>
+                    <p>Interactive concept activity for advanced MRI exam training and understanding.</p>
+                    <a href="https://lmoustafa11.github.io/imagehost/avdmriexamconcept.html" class="btn" target="_blank">Open Activity</a>
+                </div>
+
+                <div class="resource-card" onclick="window.open('https://lmoustafa11.github.io/imagehost/Caller%20Persona%20Switchboard.html', '_blank')">
+                    <h2><span class="icon">🎭</span>MRI Caller Persona Switchboard</h2>
+                    <p>Interactive switchboard for practicing different caller personas and scenarios in MRI scheduling.</p>
+                    <a href="https://lmoustafa11.github.io/imagehost/Caller%20Persona%20Switchboard.html" class="btn" target="_blank">Open Activity</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.resource-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
 </body>
 </html>
