@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRI Call Center Agent Training</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #00f2fe;
+            --secondary: #ff00ff;
+            --accent: #00ff88;
+            --dark: #0a0e27;
+            --darker: #050812;
+            --light: #e0e8ff;
+            --correct: #00ff88;
+            --incorrect: #ff0055;
+            --warning: #ffaa00;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #1a1f3a 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* App Header */
+        .app-header {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 2px solid rgba(0, 242, 254, 0.3);
+            padding: 20px;
+            margin: -20px -20px 30px -20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .app-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--light);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            line-height: 1.2;
+        }
+        
+        .app-subtitle {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .app-logo {
+            width: 120px;
+            height: auto;
+            opacity: 0.9;
+        }
+        
+        /* Welcome Screen */
+        .welcome-screen {
+            text-align: center;
+            padding: 60px 20px;
+            animation: fadeIn 0.8s ease-in;
+        }
+        
+        .welcome-screen h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 242, 254, 0.5)); }
+            50% { filter: drop-shadow(0 0 40px rgba(255, 0, 255, 0.7)); }
+        }
+        
+        .welcome-screen p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 800px;
+            text-align: left;
+            backdrop-filter: blur(10px);
+        }
+        
+        .instructions h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .instructions li {
+            padding: 12px 0;
+            padding-left: 35px;
+            position: relative;
+            font-size: 1.1rem;
+        }
+        
+        .instructions li:before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            font-family: 'Orbitron', sans-serif;
+            padding: 18px 45px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.5);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            border: 2px solid var(--accent);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: var(--accent);
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar-bg {
+            background: rgba(255, 255, 255, 0.1);
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar-fill {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+        
+        /* Level Screen */
+        .level-screen {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .level-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .level-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .level-header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        /* Activity Container */
+        .activity-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Flashcard */
+        .flashcard-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .flashcard {
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .flashcard-front {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 255, 0.2));
+            border: 3px solid var(--primary);
+        }
+        
+        .flashcard-back {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(255, 170, 0, 0.2));
+            border: 3px solid var(--accent);
+            transform: rotateY(180deg);
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+        
+        .flashcard-controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .card-counter {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        /* Drag and Drop */
+        .drag-drop-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+            max-width: 100%;
+        }
+        
+        .drag-items, .drop-zones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .drag-item {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 255, 0.1));
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 12px 15px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        
+        .drag-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.4);
+        }
+        
+        .drag-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        
+        .drag-item.matched {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 255, 136, 0.1));
+            border-color: var(--correct);
+            cursor: default;
+        }
+        
+        .drop-zone {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 15px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .drop-zone.drag-over {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .drop-zone.filled {
+            border-style: solid;
+            border-color: var(--accent);
+        }
+        
+        .drop-zone.correct {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: var(--correct);
+        }
+        
+        .drop-zone.incorrect {
+            background: rgba(255, 0, 85, 0.2);
+            border-color: var(--incorrect);
+        }
+        
+        .drop-zone-label {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        /* Multiple Choice */
+        .question-container {
+            margin-bottom: 40px;
+        }
+        
+        .question {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            line-height: 1.8;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border-left: 5px solid var(--primary);
+        }
+        
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .choice {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .choice:hover {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: var(--primary);
+            transform: translateX(10px);
+        }
+        
+        .choice.selected {
+            background: rgba(0, 242, 254, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .choice.correct {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: var(--correct);
+            animation: correctPulse 0.5s ease;
+        }
+        
+        .choice.incorrect {
+            background: rgba(255, 0, 85, 0.2);
+            border-color: var(--incorrect);
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        /* Scenario Branching */
+        .scenario-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .caller-dialogue {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.2), rgba(255, 0, 255, 0.05));
+            border: 2px solid var(--secondary);
+            border-radius: 20px;
+            padding: 30px 30px 30px 50px;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            position: relative;
+        }
+        
+        .caller-dialogue:before {
+            content: '📞';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.5rem;
+            background: transparent;
+            padding: 0;
+        }
+        
+        .personality-badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-top: 15px;
+        }
+        
+        /* Results Screen */
+        .results-screen {
+            text-align: center;
+            padding: 60px 20px;
+            animation: fadeIn 0.8s ease-in;
+        }
+        
+        .results-score {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 6rem;
+            font-weight: 900;
+            margin: 40px 0;
+            line-height: 1;
+        }
+        
+        .results-score.pass {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: victoryGlow 2s ease-in-out infinite;
+        }
+        
+        .results-score.fail {
+            background: linear-gradient(135deg, var(--incorrect), var(--warning));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        @keyframes victoryGlow {
+            0%, 100% { filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.8)); }
+            50% { filter: drop-shadow(0 0 60px rgba(0, 242, 254, 0.8)); }
+        }
+        
+        .results-message {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .results-breakdown {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            margin: 40px auto;
+            text-align: left;
+        }
+        
+        .results-breakdown h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Feedback Messages */
+        .feedback {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .feedback.correct {
+            background: rgba(0, 255, 136, 0.2);
+            border: 2px solid var(--correct);
+            color: var(--correct);
+        }
+        
+        .feedback.incorrect {
+            background: rgba(255, 0, 85, 0.2);
+            border: 2px solid var(--incorrect);
+            color: var(--incorrect);
+        }
+        
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .welcome-screen h1 {
+                font-size: 2rem;
+            }
+            
+            .drag-drop-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .flashcard {
+                height: 300px;
+            }
+            
+            .results-score {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Content will be dynamically inserted here -->
+    </div>
+
+    <script>
+        // Global State
+        const state = {
+            currentLevel: 0,
+            currentActivity: 0,
+            scores: [],
+            totalQuestions: 0,
+            correctAnswers: 0,
+            levelScores: []
+        };
+
+        // Content Data
+        const levels = [
+            {
+                id: 1,
+                name: 'Beginner',
+                title: 'MRI Terminology Basics',
+                description: 'Learn essential MRI types and terminology',
+                activities: [
+                    {
+                        type: 'flashcard',
+                        title: 'MRI Types and Body Parts',
+                        cards: [
+                            { front: 'Brain MRI', back: 'Magnetic Resonance Imaging of the brain to detect abnormalities, tumors, strokes, or other neurological conditions' },
+                            { front: 'Spine MRI', back: 'Imaging of the cervical, thoracic, or lumbar spine to diagnose disc problems, spinal stenosis, or injuries' },
+                            { front: 'Joint MRI', back: 'Detailed imaging of joints (knee, shoulder, hip, ankle) to assess ligament tears, cartilage damage, or arthritis' },
+                            { front: 'Abdominal MRI', back: 'Imaging of organs in the abdomen including liver, kidneys, pancreas, and spleen to detect diseases or abnormalities' },
+                            { front: 'Pelvic MRI', back: 'Imaging of reproductive organs, bladder, and pelvic structures for diagnostic purposes' },
+                            { front: 'Cardiac MRI', back: 'Specialized heart imaging to assess heart structure, function, and blood flow' },
+                            { front: 'Breast MRI', back: 'Supplemental screening tool for breast cancer detection, especially in high-risk patients' },
+                            { front: 'Musculoskeletal MRI', back: 'Imaging of muscles, bones, ligaments, and tendons to diagnose injuries or conditions' },
+                            { front: 'MRA (Angiography)', back: 'MR Angiography - specialized MRI to visualize blood vessels and detect blockages or aneurysms' },
+                            { front: 'Contrast MRI', back: 'MRI performed with contrast dye injection to enhance visualization of certain tissues or abnormalities' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 2,
+                name: 'Easy',
+                title: 'Medical Abbreviations',
+                description: 'Master common medical abbreviations used in scheduling',
+                activities: [
+                    {
+                        type: 'drag-drop',
+                        title: 'Match Abbreviations to Their Meanings',
+                        pairs: [
+                            { term: 'MRI', definition: 'Magnetic Resonance Imaging' },
+                            { term: 'w/contrast', definition: 'With contrast dye injection' },
+                            { term: 'w/o contrast', definition: 'Without contrast dye' },
+                            { term: 'C-spine', definition: 'Cervical Spine (neck)' },
+                            { term: 'L-spine', definition: 'Lumbar Spine (lower back)' },
+                            { term: 'T-spine', definition: 'Thoracic Spine (mid-back)' },
+                            { term: 'R knee', definition: 'Right Knee' },
+                            { term: 'L shoulder', definition: 'Left Shoulder' },
+                            { term: 'Bil', definition: 'Bilateral (both sides)' },
+                            { term: 'Stat', definition: 'Immediately/Urgent' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 3,
+                name: 'Mid Level',
+                title: 'Professional Call Handling',
+                description: 'Develop effective communication and information gathering skills',
+                activities: [
+                    {
+                        type: 'multiple-choice',
+                        title: 'Call Handling Scenarios',
+                        questions: [
+                            {
+                                question: 'A caller says "I need an MRI." What is your BEST first response?',
+                                choices: [
+                                    'Let me schedule that for you right away.',
+                                    'I\'d be happy to help you schedule an MRI. May I have your full name and date of birth to get started?',
+                                    'What kind of MRI do you need?',
+                                    'Do you have a doctor\'s order?'
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: 'A patient asks "How much will this cost?" The BEST response is:',
+                                choices: [
+                                    'I don\'t know, you\'ll have to call billing.',
+                                    'It depends on your insurance.',
+                                    'I\'d be happy to transfer you to our billing department who can provide specific cost information based on your insurance coverage.',
+                                    'MRIs are usually around $1,000.'
+                                ],
+                                correct: 2
+                            },
+                            {
+                                question: 'When gathering information for scheduling, what should you collect FIRST?',
+                                choices: [
+                                    'Patient demographics (name, DOB, phone)',
+                                    'Insurance information',
+                                    'Preferred appointment time',
+                                    'Reason for the MRI'
+                                ],
+                                correct: 0
+                            },
+                            {
+                                question: 'A caller is speaking very quickly and you missed important information. You should:',
+                                choices: [
+                                    'Guess what they said and continue',
+                                    'Politely ask them to repeat the information: "I want to make sure I have this correct. Could you please repeat..."',
+                                    'Tell them to slow down',
+                                    'Transfer them to someone else'
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: 'What information is ESSENTIAL before scheduling an MRI?',
+                                choices: [
+                                    'Patient\'s favorite color',
+                                    'Doctor\'s order specifying the body part and with/without contrast',
+                                    'Patient\'s work schedule',
+                                    'How they heard about the facility'
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: 'A patient needs to reschedule. The BEST approach is:',
+                                choices: [
+                                    'Tell them there are no other times available',
+                                    'Express understanding and work collaboratively to find an alternative time that works for them',
+                                    'Ask why they need to reschedule',
+                                    'Warn them about cancellation fees'
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: 'When ending a call, you should ALWAYS:',
+                                choices: [
+                                    'Hang up quickly to take the next call',
+                                    'Summarize the appointment details, ask if they have questions, and thank them for calling',
+                                    'Just say goodbye',
+                                    'Tell them to call back if they have questions'
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: 'Active listening means:',
+                                choices: [
+                                    'Listening while doing other tasks',
+                                    'Fully concentrating, understanding, and responding appropriately with verbal confirmations',
+                                    'Waiting for your turn to talk',
+                                    'Writing everything down word for word'
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: 'A patient mentions they are claustrophobic. Your BEST response is:',
+                                choices: [
+                                    'MRI machines are pretty tight, you might want to cancel',
+                                    'I understand your concern. We have options to help - open MRI machines, sedation if prescribed by your doctor, and techniques to make you comfortable. Would you like to discuss these?',
+                                    'You\'ll just have to deal with it',
+                                    'Most people get through it fine'
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: 'If you don\'t know the answer to a patient\'s question, you should:',
+                                choices: [
+                                    'Make up an answer so they don\'t lose confidence',
+                                    'Tell them to Google it',
+                                    'Acknowledge you don\'t know and offer to find the correct information or transfer them to someone who can help',
+                                    'Ignore the question and move on'
+                                ],
+                                correct: 2
+                            },
+                            {
+                                question: 'What does "STAT" mean when a doctor orders a STAT MRI?',
+                                choices: [
+                                    'Schedule next week',
+                                    'Immediately/Urgent - needs to be done as soon as possible',
+                                    'Patient is a statistics professor',
+                                    'Standard timing'
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: 'A patient asks if they need to fast before their MRI. You should:',
+                                choices: [
+                                    'Tell them yes, always fast for MRIs',
+                                    'Tell them no, fasting is never required',
+                                    'Explain that it depends on the type of MRI and body part being scanned - abdominal MRIs often require fasting. Provide specific pre-appointment instructions.',
+                                    'Tell them to ask their doctor'
+                                ],
+                                correct: 2
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 4,
+                name: 'Expert',
+                title: 'Caller Personality Recognition',
+                description: 'Identify and adapt to different caller personality types',
+                activities: [
+                    {
+                        type: 'personality-id',
+                        title: 'Identify the Caller Personality Type',
+                        scenarios: [
+                            {
+                                dialogue: '"I\'m really worried about this MRI... What if they find something? I\'ve been so stressed I can barely sleep. Is the MRI machine really loud? I read online it\'s like being in a tunnel. What if I panic?"',
+                                choices: ['Anxious', 'Angry/Aggressive', 'Rushed/Impatient', 'Friendly/Chatty'],
+                                correct: 0,
+                                strategy: 'Use a calm, reassuring tone. Provide clear information. Validate their concerns. Offer solutions (open MRI, music options). Take your time.'
+                            },
+                            {
+                                dialogue: '"This is the THIRD time I\'ve called! Nobody knows what they\'re doing over there! I was supposed to get a call back yesterday and NOTHING! This is completely unacceptable!"',
+                                choices: ['Skeptical', 'Angry/Aggressive', 'Confused', 'Friendly/Chatty'],
+                                correct: 1,
+                                strategy: 'Stay calm and professional. Apologize for the inconvenience. Take ownership of the issue. Focus on solving the problem immediately. Don\'t take it personally.'
+                            },
+                            {
+                                dialogue: '"Wait, I need an MRI? I thought it was an X-ray. Or was it a CT scan? My doctor said something about pictures... I\'m not sure what I\'m supposed to be scheduling. Can you explain the difference?"',
+                                choices: ['Confused', 'Elderly/Needs Extra Help', 'Skeptical', 'Anxious'],
+                                correct: 0,
+                                strategy: 'Be patient and clear. Use simple language. Break down information into small chunks. Confirm understanding. Offer to call the doctor\'s office to verify the order.'
+                            },
+                            {
+                                dialogue: '"I need this scheduled TODAY. I have meetings all next week, then I\'m traveling. I need the earliest possible slot. Can you just give me the first available? I don\'t have time for a lot of questions."',
+                                choices: ['Rushed/Impatient', 'Angry/Aggressive', 'Friendly/Chatty', 'Skeptical'],
+                                correct: 0,
+                                strategy: 'Be efficient and direct. Get to the point quickly. Minimize small talk. Provide options concisely. Move through the process swiftly while still being thorough.'
+                            },
+                            {
+                                dialogue: '"Oh thank you so much for answering! How are you doing today? This weather has been crazy, hasn\'t it? Anyway, I need to schedule an MRI. My doctor is wonderful, Dr. Smith, do you know him? He\'s been my doctor for 15 years..."',
+                                choices: ['Friendly/Chatty', 'Elderly/Needs Extra Help', 'Anxious', 'Confused'],
+                                correct: 0,
+                                strategy: 'Be warm and personable, but gently guide the conversation back to the task. Balance friendliness with efficiency. Use their chattiness to build rapport.'
+                            },
+                            {
+                                dialogue: '"I saw online that MRI contrast can cause kidney problems. Why do I need contrast? How do I know your facility is accredited? What\'s your safety record? I want to see the credentials of the technologist."',
+                                choices: ['Skeptical', 'Anxious', 'Angry/Aggressive', 'Confused'],
+                                correct: 0,
+                                strategy: 'Provide factual information. Be transparent. Acknowledge their concerns as valid. Offer to connect them with clinical staff. Don\'t be defensive.'
+                            },
+                            {
+                                dialogue: '"Hello dear, I\'m calling about... well, my daughter made this appointment for me but I need to change it. Let me find the paper... just a moment... I have it written down somewhere. I\'m not good with these dates. Which month are we in now?"',
+                                choices: ['Elderly/Needs Extra Help', 'Confused', 'Anxious', 'Friendly/Chatty'],
+                                correct: 0,
+                                strategy: 'Be extra patient and respectful. Speak clearly at a moderate pace. Repeat information as needed. Offer to help them find information. Never rush them.'
+                            },
+                            {
+                                dialogue: '"Hello, yes, I am calling for MRI appointment. Sorry, my English not so good. I need... for my back? The doctor say I need... how you say... the pictures?"',
+                                choices: ['Non-English Speaker/Language Barrier', 'Confused', 'Elderly/Needs Extra Help', 'Anxious'],
+                                correct: 0,
+                                strategy: 'Speak slowly and clearly. Use simple words. Be patient. Confirm understanding frequently. Offer interpreter services if available. Use visual references ("back MRI").'
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 5,
+                name: 'Master Level',
+                title: 'De-escalation & Advanced Scenarios',
+                description: 'Handle challenging situations with expert-level skills',
+                activities: [
+                    {
+                        type: 'scenario-branching',
+                        title: 'Complex Call Scenarios',
+                        scenarios: [
+                            {
+                                situation: 'An angry caller says: "I\'ve been on hold for 20 minutes! This is ridiculous! I want to speak to your supervisor RIGHT NOW!"',
+                                question: 'What is the BEST first response?',
+                                choices: [
+                                    'Ma\'am/Sir, I understand you\'re frustrated. I sincerely apologize for the wait time. I\'m here to help you right now. Can you tell me what you need assistance with?',
+                                    'I\'m sorry, but we\'re very busy. Everyone has to wait.',
+                                    'Let me transfer you to a supervisor.',
+                                    'Actually, our system shows you were only on hold for 12 minutes.'
+                                ],
+                                correct: 0,
+                                explanation: 'Acknowledge emotions, apologize sincerely, take ownership, and redirect to problem-solving. Never argue about wait times or deflect immediately to a supervisor.'
+                            },
+                            {
+                                situation: 'A patient is crying on the phone: "I just found out I might have a brain tumor. I\'m so scared. The doctor wants me to get this MRI as soon as possible."',
+                                question: 'What is the MOST appropriate response?',
+                                choices: [
+                                    'Don\'t worry, I\'m sure everything will be fine.',
+                                    'I can only imagine how frightening this must be for you. Let me help you get this scheduled as quickly as possible. We\'ll take good care of you.',
+                                    'A lot of people get brain MRIs and they\'re fine.',
+                                    'Let me just get your information and schedule the appointment.'
+                                ],
+                                correct: 1,
+                                explanation: 'Show empathy without minimizing their feelings or making false promises. Focus on what you CAN do to help them right now.'
+                            },
+                            {
+                                situation: 'A caller says: "Why do I need pre-authorization? This is an emergency! My doctor said I need this done this week!"',
+                                question: 'The BEST response is:',
+                                choices: [
+                                    'Those are just the rules. There\'s nothing I can do.',
+                                    'I understand this feels urgent. Pre-authorization is required by your insurance company before we can schedule. However, let me see what we can do. I can reach out to your doctor\'s office to expedite this, or I can transfer you to our pre-auth team who may have solutions for urgent cases.',
+                                    'You\'ll have to call your insurance company.',
+                                    'If it\'s really an emergency, you should go to the ER.'
+                                ],
+                                correct: 1,
+                                explanation: 'Explain the requirement clearly but focus on solutions and next steps. Show initiative in helping them navigate the process.'
+                            },
+                            {
+                                situation: 'A patient asks: "I have a metal implant. Can I still get an MRI? I\'m not sure what kind of metal it is."',
+                                question: 'The MOST appropriate response is:',
+                                choices: [
+                                    'You\'ll probably be fine.',
+                                    'That\'s an important safety question. Certain metal implants can be contraindicated for MRI. I need to transfer you to our clinical staff who can review your specific situation and determine if the MRI is safe for you. They may need documentation from your implant surgeon.',
+                                    'Just tell the MRI tech when you get here.',
+                                    'Most implants nowadays are MRI-safe, so don\'t worry.'
+                                ],
+                                correct: 1,
+                                explanation: 'Never make assumptions about medical safety. This is a clinical question that requires proper screening by qualified staff.'
+                            },
+                            {
+                                situation: 'A caller is speaking very quickly and mentions: chest pain, shortness of breath, and that their doctor told them to go to the ER, but they want to schedule an outpatient MRI instead.',
+                                question: 'What should you do?',
+                                choices: [
+                                    'Schedule the earliest available MRI appointment.',
+                                    'Tell them they need to follow their doctor\'s advice and go to the emergency room if they\'re experiencing those symptoms right now. Explain that an outpatient MRI is not appropriate for emergency situations.',
+                                    'Ask them to call back when they\'re feeling better.',
+                                    'Transfer them to your supervisor.'
+                                ],
+                                correct: 1,
+                                explanation: 'Recognize emergency symptoms. Reinforce the doctor\'s recommendation. Patient safety is the top priority. Do not schedule non-emergency services for emergent situations.'
+                            },
+                            {
+                                situation: 'A patient says: "I showed up for my appointment yesterday and you had NO record of it! I took time off work! This is completely unprofessional!"',
+                                question: 'What is the BEST approach to de-escalate and resolve this?',
+                                choices: [
+                                    'Are you sure you had the right date and location?',
+                                    'I sincerely apologize that happened to you. That must have been incredibly frustrating. Let me look into this right away to understand what went wrong and make this right. Can I have your name and the appointment details?',
+                                    'We don\'t make those kinds of mistakes. You must have called a different facility.',
+                                    'I wasn\'t working yesterday, so I don\'t know what happened.'
+                                ],
+                                correct: 1,
+                                explanation: 'Take full ownership even if you weren\'t personally involved. Apologize genuinely. Validate their frustration. Focus on investigation and resolution. Never blame the patient.'
+                            },
+                            {
+                                situation: 'A patient says: "Your facility is 45 minutes away! Don\'t you have anything closer? Why can\'t you accommodate me?"',
+                                question: 'The MOST professional response is:',
+                                choices: [
+                                    'That\'s just where we\'re located. Take it or leave it.',
+                                    'I understand that\'s not convenient for you. Let me check if we have any partner facilities closer to your location, or if we have any mobile MRI options. May I ask your zip code?',
+                                    'Everyone else manages to get here.',
+                                    'You can try calling other places if you want.'
+                                ],
+                                correct: 1,
+                                explanation: 'Show empathy for their concern. Proactively offer solutions. Be helpful and go the extra mile to find alternatives that work for the patient.'
+                            },
+                            {
+                                situation: 'A patient mentions: "I had a bad experience at your facility last time. The staff was rude and I waited 2 hours past my appointment time."',
+                                question: 'How should you respond?',
+                                choices: [
+                                    'That doesn\'t sound like us. Maybe you\'re thinking of somewhere else.',
+                                    'I\'m very sorry you had that experience. That\'s not the level of service we strive to provide. I\'d like to document this feedback. Would you be willing to share more details? I want to ensure this doesn\'t happen again.',
+                                    'Well, sometimes we get busy and delays happen.',
+                                    'I wasn\'t here that day so I can\'t help you.'
+                                ],
+                                correct: 1,
+                                explanation: 'Never dismiss or invalidate their experience. Apologize sincerely. Show you take feedback seriously. Demonstrate commitment to improvement. Offer to escalate if appropriate.'
+                            },
+                            {
+                                situation: 'A caller says angrily: "I\'ve been trying to get my MRI results for a WEEK! Nobody will call me back! This is about my HEALTH!"',
+                                question: 'What is the BEST response?',
+                                choices: [
+                                    'Results can take time. You just need to be patient.',
+                                    'I completely understand your frustration - waiting for health results is very stressful. Unfortunately, I don\'t have access to results as they go directly to your ordering physician, but let me transfer you to our results department who can check the status immediately.',
+                                    'That\'s not my department.',
+                                    'Your doctor should have called you.'
+                                ],
+                                correct: 1,
+                                explanation: 'Validate the emotional weight of waiting for health information. Clarify the process. Take immediate action to connect them with the right resource. Never pass the buck without helping.'
+                            },
+                            {
+                                situation: 'A patient says: "I can\'t afford this. My insurance denied it. But my doctor says I really need this MRI. What am I supposed to do?"',
+                                question: 'The MOST compassionate and helpful response is:',
+                                choices: [
+                                    'I\'m sorry, but without insurance approval, you\'ll have to pay out of pocket.',
+                                    'I understand this is a difficult situation. Let me connect you with our financial counselor who can discuss payment plans, charity care options, and help you appeal the insurance denial. We want to make sure you get the care you need.',
+                                    'You should call your insurance company.',
+                                    'Maybe try a different facility.'
+                                ],
+                                correct: 1,
+                                explanation: 'Show empathy for financial concerns. Never make patients feel helpless. Connect them with financial resources. Demonstrate that the facility cares about access to care, not just payment.'
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // Utility Functions
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function renderWelcomeScreen() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                ${renderAppHeader()}
+                <div class="welcome-screen">
+                    <h1>MRI Call Center Training</h1>
+                    <p>Master the art of professional call handling for MRI scheduling</p>
+                    
+                    <div class="instructions">
+                        <h2>Training Overview</h2>
+                        <ul>
+                            <li>5 progressive difficulty levels: Beginner → Master</li>
+                            <li>Duration: 15-25 minutes</li>
+                            <li>Interactive activities including flashcards, matching, scenarios, and more</li>
+                            <li>Minimum passing score: 85%</li>
+                            <li>Track your performance across all levels</li>
+                            <li>Retake if needed - questions will be randomized</li>
+                        </ul>
+                        
+                        <h2 style="margin-top: 30px;">What You'll Learn</h2>
+                        <ul>
+                            <li>Essential MRI terminology and medical abbreviations</li>
+                            <li>Professional call handling and communication skills</li>
+                            <li>Recognition of 8 caller personality types</li>
+                            <li>De-escalation techniques for difficult situations</li>
+                            <li>Best practices for information gathering</li>
+                        </ul>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="startTraining()">Begin Training</button>
+                </div>
+            `;
+        }
+
+        function renderAppHeader() {
+            return `
+                <div class="app-header">
+                    <div>
+                        <div class="app-title">MRI CALL CENTER<br>TRAINING</div>
+                        <div class="app-subtitle">Professional Call Handling Excellence</div>
+                    </div>
+                    <div style="text-align: right; font-family: 'Orbitron', sans-serif; color: var(--primary);">
+                        <div style="font-size: 1.5rem; font-weight: 700;">☎️</div>
+                        <div style="font-size: 0.7rem; margin-top: 5px;">MRI Center</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProgressBar() {
+            const totalLevels = levels.length;
+            const completedLevels = state.currentLevel;
+            const progress = (completedLevels / totalLevels) * 100;
+            
+            return `
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span>Level ${completedLevels + 1} of ${totalLevels}: ${levels[state.currentLevel]?.name || 'Complete'}</span>
+                        <span>${Math.round(progress)}% Complete</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${progress}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFlashcard(activity) {
+            const cards = shuffle(activity.cards);
+            let currentCardIndex = 0;
+            let cardsViewed = 0;
+            const requiredViews = cards.length;
+
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                ${renderAppHeader()}
+                ${renderProgressBar()}
+                <div class="level-screen">
+                    <div class="level-header">
+                        <h2>${levels[state.currentLevel].title}</h2>
+                        <p>${activity.title}</p>
+                    </div>
+                    
+                    <div class="activity-container">
+                        <div class="flashcard-container">
+                            <div class="flashcard" id="flashcard">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <p>${cards[currentCardIndex].front}</p>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <p>${cards[currentCardIndex].back}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard-controls">
+                                <button class="btn btn-secondary" onclick="flashcardPrevious()">← Previous</button>
+                                <span class="card-counter" id="card-counter">${currentCardIndex + 1} / ${cards.length}</span>
+                                <button class="btn btn-secondary" onclick="flashcardNext()">Next →</button>
+                            </div>
+                            
+                            <p style="text-align: center; margin-top: 20px; opacity: 0.7;">Click card to flip | View all cards to continue</p>
+                            
+                            <button class="btn btn-primary" id="continue-btn" style="margin-top: 30px; opacity: 0.5; cursor: not-allowed;" disabled>Continue to Next Level</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Store in window for global access
+            window.flashcardData = {
+                cards,
+                currentCardIndex,
+                cardsViewed: new Set(),
+                requiredViews
+            };
+
+            // Add click listener to flip card
+            document.getElementById('flashcard').addEventListener('click', function() {
+                this.classList.toggle('flipped');
+                window.flashcardData.cardsViewed.add(window.flashcardData.currentCardIndex);
+                checkFlashcardCompletion();
+            });
+        }
+
+        window.flashcardNext = function() {
+            const data = window.flashcardData;
+            if (data.currentCardIndex < data.cards.length - 1) {
+                data.currentCardIndex++;
+                updateFlashcard();
+            }
+        };
+
+        window.flashcardPrevious = function() {
+            const data = window.flashcardData;
+            if (data.currentCardIndex > 0) {
+                data.currentCardIndex--;
+                updateFlashcard();
+            }
+        };
+
+        function updateFlashcard() {
+            const data = window.flashcardData;
+            const card = document.getElementById('flashcard');
+            card.classList.remove('flipped');
+            
+            const front = card.querySelector('.flashcard-front p');
+            const back = card.querySelector('.flashcard-back p');
+            front.textContent = data.cards[data.currentCardIndex].front;
+            back.textContent = data.cards[data.currentCardIndex].back;
+            
+            document.getElementById('card-counter').textContent = `${data.currentCardIndex + 1} / ${data.cards.length}`;
+        }
+
+        function checkFlashcardCompletion() {
+            const data = window.flashcardData;
+            if (data.cardsViewed.size >= data.requiredViews) {
+                const btn = document.getElementById('continue-btn');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.onclick = nextLevel;
+            }
+        }
+
+        function renderDragDrop(activity) {
+            const pairs = shuffle(activity.pairs); // Use all pairs
+            const terms = shuffle([...pairs]);
+            const definitions = shuffle([...pairs]);
+            
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                ${renderAppHeader()}
+                ${renderProgressBar()}
+                <div class="level-screen">
+                    <div class="level-header">
+                        <h2>${levels[state.currentLevel].title}</h2>
+                        <p>${activity.title}</p>
+                    </div>
+                    
+                    <div class="activity-container">
+                        <div class="drag-drop-container">
+                            <div>
+                                <h3 style="margin-bottom: 12px; color: var(--primary); font-size: 1.1rem;">Terms</h3>
+                                <div class="drag-items" id="drag-items">
+                                    ${terms.map((pair, idx) => `
+                                        <div class="drag-item" draggable="true" data-term="${pair.term}" data-id="${idx}">
+                                            ${pair.term}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 style="margin-bottom: 12px; color: var(--accent); font-size: 1.1rem;">Definitions</h3>
+                                <div class="drop-zones" id="drop-zones">
+                                    ${definitions.map((pair, idx) => `
+                                        <div class="drop-zone" data-definition="${pair.definition}" data-term="${pair.term}" data-id="${idx}">
+                                            <div class="drop-zone-label">${pair.definition}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="check-matches" style="margin-top: 20px; opacity: 0.5; cursor: not-allowed;" disabled>Check Answers</button>
+                        <div id="drag-drop-feedback"></div>
+                        <button class="btn btn-primary hidden" id="continue-btn" onclick="nextLevel()">Continue to Next Level</button>
+                    </div>
+                </div>
+            `;
+
+            window.dragDropData = {
+                pairs,
+                matches: {},
+                totalPairs: pairs.length
+            };
+
+            setupDragAndDrop();
+        }
+
+        function setupDragAndDrop() {
+            const dragItems = document.querySelectorAll('.drag-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            dragItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.target.dataset.term);
+                    e.target.classList.add('dragging');
+                });
+
+                item.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    
+                    const term = e.dataTransfer.getData('text/plain');
+                    const draggedItem = document.querySelector(`.drag-item[data-term="${term}"]`);
+                    
+                    // Remove previous item if exists
+                    const existingItem = zone.querySelector('.drag-item');
+                    if (existingItem) {
+                        document.getElementById('drag-items').appendChild(existingItem);
+                        existingItem.classList.remove('matched');
+                    }
+                    
+                    zone.appendChild(draggedItem);
+                    zone.classList.add('filled');
+                    
+                    window.dragDropData.matches[zone.dataset.term] = term;
+                    
+                    checkDragDropCompletion();
+                });
+            });
+        }
+
+        function checkDragDropCompletion() {
+            const filledZones = document.querySelectorAll('.drop-zone.filled').length;
+            if (filledZones === window.dragDropData.totalPairs) {
+                const btn = document.getElementById('check-matches');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.onclick = checkDragDropAnswers;
+            }
+        }
+
+        function checkDragDropAnswers() {
+            const matches = window.dragDropData.matches;
+            let correct = 0;
+            
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                const correctTerm = zone.dataset.term;
+                const userTerm = matches[correctTerm];
+                
+                if (userTerm === correctTerm) {
+                    zone.classList.add('correct');
+                    zone.querySelector('.drag-item')?.classList.add('matched');
+                    correct++;
+                } else {
+                    zone.classList.add('incorrect');
+                }
+            });
+            
+            state.totalQuestions += window.dragDropData.totalPairs;
+            state.correctAnswers += correct;
+            state.levelScores.push({ level: state.currentLevel + 1, correct, total: window.dragDropData.totalPairs });
+            
+            const feedback = document.getElementById('drag-drop-feedback');
+            const percentage = (correct / window.dragDropData.totalPairs * 100).toFixed(0);
+            feedback.innerHTML = `<div class="feedback ${percentage >= 85 ? 'correct' : 'incorrect'}">
+                You matched ${correct} out of ${window.dragDropData.totalPairs} correctly (${percentage}%)
+            </div>`;
+            
+            document.getElementById('check-matches').classList.add('hidden');
+            document.getElementById('continue-btn').classList.remove('hidden');
+        }
+
+        function renderMultipleChoice(activity) {
+            const questions = shuffle(activity.questions); // Use all questions
+            let currentQuestion = 0;
+            let correct = 0;
+            
+            window.mcData = {
+                questions,
+                currentQuestion,
+                correct,
+                answered: false
+            };
+            
+            renderMCQuestion();
+        }
+
+        function renderMCQuestion() {
+            const data = window.mcData;
+            const question = data.questions[data.currentQuestion];
+            const shuffledChoices = question.choices.map((choice, idx) => ({ choice, originalIdx: idx }));
+            shuffle(shuffledChoices);
+            
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                ${renderAppHeader()}
+                ${renderProgressBar()}
+                <div class="level-screen">
+                    <div class="level-header">
+                        <h2>${levels[state.currentLevel].title}</h2>
+                        <p>Question ${data.currentQuestion + 1} of ${data.questions.length}</p>
+                    </div>
+                    
+                    <div class="activity-container">
+                        <div class="question-container">
+                            <div class="question">${question.question}</div>
+                            <div class="choices" id="choices">
+                                ${shuffledChoices.map((item, idx) => `
+                                    <div class="choice" data-idx="${item.originalIdx}" onclick="selectChoice(${item.originalIdx})">
+                                        ${item.choice}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div id="mc-feedback"></div>
+                        
+                        <button class="btn btn-primary" id="next-question" style="margin-top: 20px;" class="hidden"></button>
+                    </div>
+                </div>
+            `;
+            
+            window.mcData.answered = false;
+        }
+
+        window.selectChoice = function(idx) {
+            if (window.mcData.answered) return;
+            
+            const data = window.mcData;
+            const question = data.questions[data.currentQuestion];
+            const choices = document.querySelectorAll('.choice');
+            
+            choices.forEach(choice => {
+                choice.style.pointerEvents = 'none';
+                const choiceIdx = parseInt(choice.dataset.idx);
+                
+                if (choiceIdx === question.correct) {
+                    choice.classList.add('correct');
+                }
+                if (choiceIdx === idx && idx !== question.correct) {
+                    choice.classList.add('incorrect');
+                }
+            });
+            
+            const isCorrect = idx === question.correct;
+            if (isCorrect) {
+                data.correct++;
+            }
+            
+            const feedback = document.getElementById('mc-feedback');
+            feedback.innerHTML = `<div class="feedback ${isCorrect ? 'correct' : 'incorrect'}">
+                ${isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+            </div>`;
+            
+            data.answered = true;
+            
+            const nextBtn = document.getElementById('next-question');
+            nextBtn.classList.remove('hidden');
+            
+            if (data.currentQuestion < data.questions.length - 1) {
+                nextBtn.textContent = 'Next Question';
+                nextBtn.onclick = () => {
+                    data.currentQuestion++;
+                    renderMCQuestion();
+                };
+            } else {
+                nextBtn.textContent = 'Continue to Next Level';
+                nextBtn.onclick = () => {
+                    state.totalQuestions += data.questions.length;
+                    state.correctAnswers += data.correct;
+                    state.levelScores.push({ level: state.currentLevel + 1, correct: data.correct, total: data.questions.length });
+                    nextLevel();
+                };
+            }
+        };
+
+        function renderPersonalityID(activity) {
+            const scenarios = shuffle(activity.scenarios); // Use all 8 personality types
+            let currentScenario = 0;
+            let correct = 0;
+            
+            window.personalityData = {
+                scenarios,
+                currentScenario,
+                correct,
+                answered: false
+            };
+            
+            renderPersonalityScenario();
+        }
+
+        function renderPersonalityScenario() {
+            const data = window.personalityData;
+            const scenario = data.scenarios[data.currentScenario];
+            const shuffledChoices = shuffle([...scenario.choices]);
+            const correctAnswer = scenario.choices[scenario.correct];
+            
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                ${renderAppHeader()}
+                ${renderProgressBar()}
+                <div class="level-screen">
+                    <div class="level-header">
+                        <h2>${levels[state.currentLevel].title}</h2>
+                        <p>Scenario ${data.currentScenario + 1} of ${data.scenarios.length}</p>
+                    </div>
+                    
+                    <div class="activity-container">
+                        <div class="scenario-container">
+                            <div class="caller-dialogue">
+                                "${scenario.dialogue}"
+                            </div>
+                            
+                            <div class="question">What personality type is this caller displaying?</div>
+                            
+                            <div class="choices" id="choices">
+                                ${shuffledChoices.map((choice, idx) => `
+                                    <div class="choice" data-choice="${idx}">
+                                        ${choice}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div id="personality-feedback"></div>
+                        
+                        <button class="btn btn-primary hidden" id="next-scenario" style="margin-top: 20px;"></button>
+                    </div>
+                </div>
+            `;
+            
+            // Store current scenario data for event handler
+            window.personalityData.answered = false;
+            window.personalityData.shuffledChoices = shuffledChoices;
+            window.personalityData.correctAnswer = correctAnswer;
+            window.personalityData.strategy = scenario.strategy;
+            
+            // Add event listeners to all choices
+            const choices = document.querySelectorAll('#choices .choice');
+            choices.forEach((choiceEl, idx) => {
+                choiceEl.addEventListener('click', function() {
+                    selectPersonality(shuffledChoices[idx], correctAnswer, scenario.strategy);
+                });
+            });
+        }
+
+        window.selectPersonality = function(selected, correct, strategy) {
+            if (window.personalityData.answered) return;
+            
+            const data = window.personalityData;
+            const choices = document.querySelectorAll('.choice');
+            
+            choices.forEach(choice => {
+                choice.style.pointerEvents = 'none';
+                if (choice.textContent.trim() === correct) {
+                    choice.classList.add('correct');
+                }
+                if (choice.textContent.trim() === selected && selected !== correct) {
+                    choice.classList.add('incorrect');
+                }
+            });
+            
+            const isCorrect = selected === correct;
+            if (isCorrect) {
+                data.correct++;
+            }
+            
+            const feedback = document.getElementById('personality-feedback');
+            feedback.innerHTML = `
+                ${renderAppHeader()}
+                <div class="feedback ${isCorrect ? 'correct' : 'incorrect'}">
+                    ${isCorrect ? '✓ Correct!' : `✗ Incorrect - The correct answer is: ${correct}`}
+                </div>
+                <div class="activity-container" style="margin-top: 20px;">
+                    <h3 style="color: var(--accent); margin-bottom: 15px;">📋 Best Strategy:</h3>
+                    <p style="font-size: 1.1rem; line-height: 1.8;">${strategy}</p>
+                </div>
+            `;
+            
+            data.answered = true;
+            
+            const nextBtn = document.getElementById('next-scenario');
+            nextBtn.classList.remove('hidden');
+            
+            if (data.currentScenario < data.scenarios.length - 1) {
+                nextBtn.textContent = 'Next Scenario';
+                nextBtn.onclick = () => {
+                    data.currentScenario++;
+                    renderPersonalityScenario();
+                };
+            } else {
+                nextBtn.textContent = 'Continue to Final Level';
+                nextBtn.onclick = () => {
+                    state.totalQuestions += data.scenarios.length;
+                    state.correctAnswers += data.correct;
+                    state.levelScores.push({ level: state.currentLevel + 1, correct: data.correct, total: data.scenarios.length });
+                    nextLevel();
+                };
+            }
+        };
+
+        function renderScenarioBranching(activity) {
+            const scenarios = shuffle(activity.scenarios);
+            let currentScenario = 0;
+            let correct = 0;
+            
+            window.scenarioData = {
+                scenarios,
+                currentScenario,
+                correct,
+                answered: false
+            };
+            
+            renderBranchingScenario();
+        }
+
+        function renderBranchingScenario() {
+            const data = window.scenarioData;
+            const scenario = data.scenarios[data.currentScenario];
+            const shuffledChoices = scenario.choices.map((choice, idx) => ({ choice, originalIdx: idx }));
+            shuffle(shuffledChoices);
+            
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                ${renderAppHeader()}
+                ${renderProgressBar()}
+                <div class="level-screen">
+                    <div class="level-header">
+                        <h2>${levels[state.currentLevel].title}</h2>
+                        <p>Scenario ${data.currentScenario + 1} of ${data.scenarios.length}</p>
+                    </div>
+                    
+                    <div class="activity-container">
+                        <div class="scenario-container">
+                            <div class="caller-dialogue">
+                                <strong>Situation:</strong><br>
+                                ${scenario.situation}
+                            </div>
+                            
+                            <div class="question">${scenario.question}</div>
+                            
+                            <div class="choices" id="choices">
+                                ${shuffledChoices.map((item, idx) => `
+                                    <div class="choice" data-idx="${item.originalIdx}">
+                                        ${item.choice}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div id="branching-feedback"></div>
+                        
+                        <button class="btn btn-primary hidden" id="next-branching" style="margin-top: 20px;"></button>
+                    </div>
+                </div>
+            `;
+            
+            window.scenarioData.answered = false;
+            
+            // Add event listeners to all choices
+            const choices = document.querySelectorAll('#choices .choice');
+            choices.forEach((choiceEl) => {
+                const originalIdx = parseInt(choiceEl.getAttribute('data-idx'));
+                choiceEl.addEventListener('click', function() {
+                    selectBranchingChoice(originalIdx);
+                });
+            });
+        }
+
+        window.selectBranchingChoice = function(idx) {
+            if (window.scenarioData.answered) return;
+            
+            const data = window.scenarioData;
+            const scenario = data.scenarios[data.currentScenario];
+            const choices = document.querySelectorAll('.choice');
+            
+            choices.forEach(choice => {
+                choice.style.pointerEvents = 'none';
+                const choiceIdx = parseInt(choice.dataset.idx);
+                
+                if (choiceIdx === scenario.correct) {
+                    choice.classList.add('correct');
+                }
+                if (choiceIdx === idx && idx !== scenario.correct) {
+                    choice.classList.add('incorrect');
+                }
+            });
+            
+            const isCorrect = idx === scenario.correct;
+            if (isCorrect) {
+                data.correct++;
+            }
+            
+            const feedback = document.getElementById('branching-feedback');
+            feedback.innerHTML = `
+                ${renderAppHeader()}
+                <div class="feedback ${isCorrect ? 'correct' : 'incorrect'}">
+                    ${isCorrect ? '✓ Excellent Response!' : '✗ Not the best approach'}
+                </div>
+                <div class="activity-container" style="margin-top: 20px;">
+                    <h3 style="color: var(--accent); margin-bottom: 15px;">💡 Why this matters:</h3>
+                    <p style="font-size: 1.1rem; line-height: 1.8;">${scenario.explanation}</p>
+                </div>
+            `;
+            
+            data.answered = true;
+            
+            const nextBtn = document.getElementById('next-branching');
+            nextBtn.classList.remove('hidden');
+            
+            if (data.currentScenario < data.scenarios.length - 1) {
+                nextBtn.textContent = 'Next Scenario';
+                nextBtn.onclick = () => {
+                    data.currentScenario++;
+                    renderBranchingScenario();
+                };
+            } else {
+                nextBtn.textContent = 'Complete Training';
+                nextBtn.onclick = () => {
+                    state.totalQuestions += data.scenarios.length;
+                    state.correctAnswers += data.correct;
+                    state.levelScores.push({ level: state.currentLevel + 1, correct: data.correct, total: data.scenarios.length });
+                    showResults();
+                };
+            }
+        };
+
+        function nextLevel() {
+            state.currentLevel++;
+            if (state.currentLevel < levels.length) {
+                renderLevel(state.currentLevel);
+            } else {
+                showResults();
+            }
+        }
+
+        function renderLevel(levelIndex) {
+            const level = levels[levelIndex];
+            const activity = level.activities[0];
+            
+            switch(activity.type) {
+                case 'flashcard':
+                    renderFlashcard(activity);
+                    break;
+                case 'drag-drop':
+                    renderDragDrop(activity);
+                    break;
+                case 'multiple-choice':
+                    renderMultipleChoice(activity);
+                    break;
+                case 'personality-id':
+                    renderPersonalityID(activity);
+                    break;
+                case 'scenario-branching':
+                    renderScenarioBranching(activity);
+                    break;
+            }
+        }
+
+        function showResults() {
+            const percentage = (state.correctAnswers / state.totalQuestions * 100).toFixed(1);
+            const passed = percentage >= 85;
+            
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                ${renderAppHeader()}
+                <div class="results-screen">
+                    <h1>Training Complete!</h1>
+                    
+                    <div class="results-score ${passed ? 'pass' : 'fail'}">
+                        ${percentage}%
+                    </div>
+                    
+                    <div class="results-message">
+                        ${passed ? 
+                            '🎉 Congratulations! You passed!' : 
+                            '📚 You need to retake the training'}
+                    </div>
+                    
+                    <div class="results-breakdown">
+                        <h3>Performance Breakdown</h3>
+                        <div class="result-item">
+                            <span>Total Questions:</span>
+                            <span><strong>${state.totalQuestions}</strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Correct Answers:</span>
+                            <span><strong>${state.correctAnswers}</strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Incorrect Answers:</span>
+                            <span><strong>${state.totalQuestions - state.correctAnswers}</strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Final Score:</span>
+                            <span><strong>${percentage}%</strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Pass Threshold:</span>
+                            <span><strong>85%</strong></span>
+                        </div>
+                        
+                        <h3 style="margin-top: 30px; margin-bottom: 15px;">Level Scores</h3>
+                        ${state.levelScores.map(level => `
+                            <div class="result-item">
+                                <span>Level ${level.level}:</span>
+                                <span><strong>${level.correct}/${level.total} (${(level.correct/level.total*100).toFixed(0)}%)</strong></span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    ${passed ? 
+                        `<p style="margin: 30px 0; font-size: 1.2rem; opacity: 0.9;">You have successfully completed the MRI Call Center Training!<br>You are now certified to handle MRI scheduling calls.</p>` :
+                        `<p style="margin: 30px 0; font-size: 1.2rem; opacity: 0.9;">Don't worry! You need 85% to pass.<br>The questions will be randomized when you retake the training.</p>`
+                    }
+                    
+                    <button class="btn btn-primary" onclick="restartTraining()">
+                        ${passed ? 'Retake Training' : 'Try Again'}
+                    </button>
+                </div>
+            `;
+        }
+
+        window.startTraining = function() {
+            state.currentLevel = 0;
+            state.totalQuestions = 0;
+            state.correctAnswers = 0;
+            state.levelScores = [];
+            renderLevel(0);
+        };
+
+        window.restartTraining = function() {
+            state.currentLevel = 0;
+            state.totalQuestions = 0;
+            state.correctAnswers = 0;
+            state.levelScores = [];
+            renderLevel(0);
+        };
+
+        // Initialize
+        renderWelcomeScreen();
+    </script>
+</body>
+</html>
