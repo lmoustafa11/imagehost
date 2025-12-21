@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caller Persona Switchboard - Master-Level Training</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg,#1e315a 0%,#4b6cb7 50%,#182848 100%);
+      min-height:100vh; padding:20px; color:#fff;
+    }
+    .container { max-width:1200px; margin:0 auto; }
+
+    .header {
+      background:#fff; color:#1e315a; padding:25px 35px; border-radius:15px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.4); margin-bottom:25px; text-align: center;
+    }
+    .header h1 { font-size:2.2rem; margin-bottom:8px; }
+    .header p { font-size:1rem; color:#666; }
+
+    .stage-indicator {
+      background: rgba(255,255,255,0.15); padding: 15px; border-radius: 10px;
+      text-align: center; margin-bottom: 20px; font-size: 0.95rem;
+    }
+
+    .call-panel {
+      background:#fff; color:#1e315a; border-radius:15px; padding:30px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.35); margin-bottom:20px;
+    }
+
+    .call-header {
+      border-bottom: 3px solid #1e315a; padding-bottom: 15px; margin-bottom: 20px;
+    }
+    .call-header h2 { font-size: 1.5rem; margin-bottom: 5px; }
+    .call-meta { font-size: 0.9rem; color: #666; font-style: italic; }
+
+    .audio-player {
+      background: linear-gradient(135deg, #1e315a 0%, #2c4a7c 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .play-btn {
+      background: #fff;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #1e315a;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+    }
+
+    .play-btn.playing {
+      background: #4caf50;
+      color: #fff;
+    }
+
+    .audio-info {
+      flex-grow: 1;
+      color: #fff;
+    }
+
+    .audio-label {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-bottom: 5px;
+    }
+
+    .audio-progress-container {
+      background: rgba(255,255,255,0.2);
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .audio-progress-bar {
+      background: #fff;
+      height: 100%;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    .audio-time {
+      font-size: 0.8rem;
+      margin-top: 5px;
+      opacity: 0.8;
+    }
+
+    .transcript-box {
+      background: #f8f9fa; border-left: 4px solid #1e315a; padding: 20px;
+      border-radius: 8px; margin-bottom: 25px; line-height: 1.6;
+      font-size: 0.95rem; color: #333;
+    }
+
+
+    .question-section {
+      margin-bottom: 30px;
+    }
+    .question-title {
+      font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;
+      color: #1e315a;
+    }
+
+    .persona-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
+      margin-bottom: 20px;
+    }
+    .persona-card {
+      background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 10px;
+      padding: 15px; cursor: pointer; transition: all 0.2s ease;
+      text-align: left;
+    }
+    .persona-card:hover {
+      border-color: #1e315a; background: #e3f2fd; transform: translateY(-2px);
+    }
+    .persona-card.selected {
+      border-color: #1e315a; background: #bbdefb; box-shadow: 0 4px 12px rgba(30,49,90,0.3);
+    }
+    .persona-name { font-weight: bold; font-size: 1rem; margin-bottom: 5px; color: #1e315a; }
+    .persona-desc { font-size: 0.85rem; color: #555; line-height: 1.4; }
+
+    .approach-options {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .approach-btn {
+      background: #fff; border: 2px solid #dee2e6; border-radius: 10px;
+      padding: 15px; text-align: left; cursor: pointer; transition: all 0.2s ease;
+      font-size: 0.95rem; color: #333;
+    }
+    .approach-btn:hover {
+      border-color: #1e315a; background: #f8f9ff; transform: translateX(5px);
+    }
+    .approach-btn.selected {
+      border-color: #1e315a; background: #e8eaf6; box-shadow: 0 4px 12px rgba(30,49,90,0.3);
+    }
+
+    .submit-btn {
+      background: #1e315a; color: #fff; border: none; padding: 15px 40px;
+      border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer;
+      width: 100%; margin-top: 20px; transition: background 0.3s ease;
+    }
+    .submit-btn:hover { background: #2c4a7c; }
+    .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+    .feedback-panel {
+      background: #e8f5e9; border-left: 5px solid #4caf50; padding: 20px;
+      border-radius: 8px; margin-top: 20px;
+    }
+    .feedback-panel.incorrect { background: #ffebee; border-left-color: #f44336; }
+    .feedback-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #1e315a; }
+    .feedback-text { font-size: 0.95rem; line-height: 1.6; color: #333; margin-bottom: 10px; }
+    .feedback-insight { background: rgba(255,255,255,0.7); padding: 12px; border-radius: 6px; margin-top: 10px; font-size: 0.9rem; }
+
+    .score-display {
+      background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;
+      text-align: center; font-size: 1.1rem; margin-bottom: 20px;
+    }
+
+    .completion-screen {
+      background:#fff; color:#1e315a; border-radius:15px; padding:50px;
+      text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.35);
+    }
+    .final-score { font-size: 4rem; font-weight: bold; color: #1e315a; margin: 20px 0; }
+    .mastery-badge {
+      display: inline-block; padding: 10px 25px; border-radius: 25px;
+      font-size: 1.2rem; font-weight: bold; margin: 20px 0;
+    }
+    .badge-master { background: #4caf50; color: #fff; }
+    .badge-proficient { background: #2196f3; color: #fff; }
+    .badge-developing { background: #ff9800; color: #fff; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Caller Persona Switchboard</h1>
+      <p>Master the art of identifying caller types and adapting your communication style</p>
+    </div>
+
+    <div id="gameArea">
+      <div class="stage-indicator" id="stageIndicator">Call 1 of 5</div>
+      <div class="score-display" id="scoreDisplay">Score: 0 / 0</div>
+
+      <div class="call-panel">
+        <div class="call-header">
+          <h2 id="callTitle">Loading Call...</h2>
+          <div class="call-meta" id="callMeta"></div>
+        </div>
+
+        <div class="audio-player" id="audioPlayer">
+          <button class="play-btn" id="playBtn">▶</button>
+          <div class="audio-info">
+            <div class="audio-label">Listen to the caller</div>
+            <div class="audio-progress-container">
+              <div class="audio-progress-bar" id="progressBar"></div>
+            </div>
+            <div class="audio-time" id="audioTime">0:00 / 0:00</div>
+          </div>
+          <audio id="audioElement" preload="metadata"></audio>
+        </div>
+
+        <div class="transcript-box" id="transcript"></div>
+
+        <div id="questionArea">
+          <div class="question-section">
+            <div class="question-title">Which caller persona best matches this interaction?</div>
+            <div class="persona-grid" id="personaGrid"></div>
+          </div>
+
+          <div class="question-section">
+            <div class="question-title">What communication approach would work best with this caller?</div>
+            <div class="approach-options" id="approachOptions"></div>
+          </div>
+
+          <button class="submit-btn" id="submitBtn">Submit Answer</button>
+        </div>
+
+        <div class="feedback-panel hidden" id="feedbackPanel">
+          <div class="feedback-title" id="feedbackTitle"></div>
+          <div class="feedback-text" id="feedbackText"></div>
+          <div class="feedback-insight" id="feedbackInsight"></div>
+          <button class="submit-btn" style="margin-top: 20px;" id="nextBtn">Continue to Next Call</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="completion-screen hidden" id="completionScreen">
+      <h1>Training Complete</h1>
+      <div class="final-score" id="finalScore">0%</div>
+      <div class="mastery-badge" id="masteryBadge">Persona Master</div>
+      <p style="font-size: 1.1rem; margin: 20px 0; color: #555;" id="finalFeedback"></p>
+      <button class="submit-btn" style="width: auto; margin-top: 30px;" onclick="location.reload()">Restart Training</button>
+    </div>
+  </div>
+
+  <script>
+    const personas = [
+      {
+        name: "The Analytical Engineer",
+        desc: "Wants data, logic, and technical precision. Asks detailed questions."
+      },
+      {
+        name: "The Anxious Patient",
+        desc: "Driven by fear and need for reassurance. Seeks emotional safety."
+      },
+      {
+        name: "The Time-Crunched Executive",
+        desc: "Values efficiency and brevity. Wants bottom-line answers fast."
+      },
+      {
+        name: "The Overwhelmed Caregiver",
+        desc: "Juggling multiple responsibilities. Needs patience and clear guidance."
+      },
+      {
+        name: "The Skeptical Researcher",
+        desc: "Questions everything. Wants evidence and second opinions."
+      },
+      {
+        name: "The Friendly Conversationalist",
+        desc: "Enjoys rapport and personal connection. May share stories."
+      }
+    ];
+
+    const calls = [
+      {
+        title: "Call 1: Insurance Coverage Question",
+        meta: "Duration: 3:45 | Topic: MRI Authorization",
+        audioSrc: "https://raw.githubusercontent.com/lmoustafa11/imagehost/main/1-insurance-coverage-question.mp3",
+        transcript: "Hi, I need to schedule an MRI, but before we go any further, I need to understand exactly how this works with my insurance. What's the CPT code? What's the authorization process timeline? And if my plan requires pre-cert, what's the denial rate for this procedure with my specific carrier? I've had issues before where things weren't communicated clearly upfront.",
+        correctPersona: "The Analytical Engineer",
+        approaches: [
+          {
+            text: "Provide specific details upfront: CPT codes, typical authorization timelines, and offer to verify their specific plan's requirements before scheduling.",
+            correct: true,
+            feedback: "Excellent match. This caller needs data and precision. By leading with technical details and offering proactive verification, you're speaking their language."
+          },
+          {
+            text: "Reassure them that the team handles insurance all the time and will take care of everything for them.",
+            correct: false,
+            feedback: "This approach dismisses their need for control and detail. The Analytical Engineer wants to understand the process, not just be told 'we've got it.'"
+          },
+          {
+            text: "Keep it brief: confirm the appointment time and let them know you'll call if there are any insurance issues.",
+            correct: false,
+            feedback: "Too vague for this persona. They want to know the process NOW, not wait for a callback if something goes wrong."
+          }
+        ],
+        insight: "The Analytical Engineer values transparency and detail. They're not being difficult—they're trying to avoid surprises. Give them the data they need to feel in control."
+      },
+      {
+        title: "Call 2: Pediatric Sedation Concern",
+        meta: "Duration: 5:20 | Topic: Child's First MRI",
+        audioSrc: null,
+        transcript: "I'm so worried about this. My son is only five, and I've been reading things online about sedation and I just... I don't know. Is it really necessary? What if something goes wrong? I know you probably think I'm overreacting, but he's my baby and I just need to know he's going to be okay.",
+        correctPersona: "The Anxious Patient",
+        approaches: [
+          {
+            text: "Normalize their fear first, then walk through safety protocols in a calm, reassuring tone. Avoid rushing to facts before acknowledging emotion.",
+            correct: true,
+            feedback: "Perfect. You recognized that this caller needs emotional validation before they can even hear the safety information. 'I know you probably think I'm overreacting' is a cry for normalization."
+          },
+          {
+            text: "Provide statistics on sedation safety and explain that complications are extremely rare.",
+            correct: false,
+            feedback: "While factually correct, leading with statistics can feel dismissive to an anxious parent. They need to feel heard before they can process data."
+          },
+          {
+            text: "Acknowledge the concern briefly, then redirect to the scheduling coordinator who can answer medical questions.",
+            correct: false,
+            feedback: "This feels like a hand-off before connection. The Anxious Patient needs someone to 'sit in the fear' with them first, even if you ultimately connect them to clinical staff."
+          }
+        ],
+        insight: "The Anxious Patient isn't looking for you to solve their fear—they need you to validate it. Once they feel heard, they can move to problem-solving."
+      },
+      {
+        title: "Call 3: Same-Day Appointment Request",
+        meta: "Duration: 2:10 | Topic: Urgent Scheduling",
+        audioSrc: null,
+        transcript: "I need a CT scan today. My doctor said it's urgent. I'm between meetings right now—can you just tell me if you have anything available this afternoon? I don't have time for a long conversation; I just need a yes or no.",
+        correctPersona: "The Time-Crunched Executive",
+        approaches: [
+          {
+            text: "Match their pace: check availability immediately, give a direct answer, and handle details via follow-up if needed.",
+            correct: true,
+            feedback: "Spot on. This caller told you exactly what they need: speed and directness. You respected their time by cutting to the chase."
+          },
+          {
+            text: "Explain that same-day appointments are difficult and walk through the typical scheduling process and wait times.",
+            correct: false,
+            feedback: "Too much process explanation for someone who explicitly said they don't have time. Give the answer first, explain later if needed."
+          },
+          {
+            text: "Build rapport by acknowledging how busy they must be, then gather detailed insurance and medical history before checking the schedule.",
+            correct: false,
+            feedback: "This caller doesn't want rapport right now—they want efficiency. Gathering details before checking availability wastes their time."
+          }
+        ],
+        insight: "The Time-Crunched Executive isn't being rude—they're being efficient. Mirror their pace and save relationship-building for when they have bandwidth."
+      },
+      {
+        title: "Call 4: Elderly Parent's Appointment",
+        meta: "Duration: 6:15 | Topic: Transportation & Prep Instructions",
+        audioSrc: null,
+        transcript: "Hi, I'm calling about my mom's mammogram next week. She's 78 and I'm trying to coordinate everything. I also have to get my kids to school that morning, so I'm trying to figure out timing. She's confused about the prep instructions—something about deodorant? And I'm not sure if I need to arrange a ride for her or if I should take her myself. I'm sorry, I know I'm all over the place. There's just a lot going on.",
+        correctPersona: "The Overwhelmed Caregiver",
+        approaches: [
+          {
+            text: "Slow down, organize the information for them, and break it into clear steps. Offer to send written instructions and be patient with repeated questions.",
+            correct: true,
+            feedback: "Excellent. You recognized the cognitive overload and became the 'organizer' for them. Breaking things into steps and offering written backup is exactly what this persona needs."
+          },
+          {
+            text: "Quickly run through all the prep instructions and appointment details so they have everything they need in one call.",
+            correct: false,
+            feedback: "Too much information too fast. The Overwhelmed Caregiver is already at capacity—they need you to slow down and chunk information."
+          },
+          {
+            text: "Suggest they call back when they have more time to focus, so you can give them the full details without rushing.",
+            correct: false,
+            feedback: "This adds another task to their already overwhelming list. Instead, help them NOW by simplifying and organizing the information."
+          }
+        ],
+        insight: "The Overwhelmed Caregiver is juggling too much. Your job is to reduce their cognitive load by being clear, patient, and offering tools (like written instructions) they can reference later."
+      },
+      {
+        title: "Call 5: Second Opinion Request",
+        meta: "Duration: 4:50 | Topic: Imaging Results Review",
+        audioSrc: null,
+        transcript: "I had an MRI done at another facility, and my doctor recommended a biopsy based on the findings. But I've been doing my own research, and I'm not convinced. I want to get the images reviewed by someone else before I agree to anything invasive. Can your radiologists do that? And how do I know they're not just going to agree with the first reading because that's what doctors do?",
+        correctPersona: "The Skeptical Researcher",
+        approaches: [
+          {
+            text: "Validate their right to a second opinion, explain the independent review process, and provide credentials or context that builds credibility without being defensive.",
+            correct: true,
+            feedback: "Perfect. You didn't take the skepticism personally. Instead, you leaned into transparency and gave them the information they need to trust the process."
+          },
+          {
+            text: "Reassure them that the original radiologist is highly qualified and that biopsies are only recommended when truly necessary.",
+            correct: false,
+            feedback: "This sounds defensive and dismisses their concern. The Skeptical Researcher doesn't want reassurance—they want evidence and process transparency."
+          },
+          {
+            text: "Acknowledge their concern and offer to have them speak directly with a radiologist to ask questions before proceeding.",
+            correct: false,
+            feedback: "While not wrong, this doesn't address their core question: 'How do I know this review will be independent?' You need to explain the process first, then offer the radiologist conversation."
+          }
+        ],
+        insight: "The Skeptical Researcher isn't being difficult—they're being thorough. They need transparency and evidence, not reassurance. Give them the 'why' and 'how,' not just the 'what.'"
+      }
+    ];
+
+    let currentCallIdx = 0;
+    let score = 0;
+    let totalQuestions = 0;
+    let selectedPersona = null;
+    let selectedApproach = null;
+    let audioElement = null;
+    let isPlaying = false;
+
+    function initGame() {
+      audioElement = document.getElementById('audioElement');
+      loadCall(0);
+      document.getElementById('submitBtn').addEventListener('click', submitAnswer);
+      document.getElementById('nextBtn').addEventListener('click', nextCall);
+      document.getElementById('playBtn').addEventListener('click', toggleAudio);
+
+      // Audio event listeners
+      audioElement.addEventListener('timeupdate', updateProgress);
+      audioElement.addEventListener('ended', () => {
+        isPlaying = false;
+        document.getElementById('playBtn').innerText = '▶';
+        document.getElementById('playBtn').classList.remove('playing');
+      });
+      audioElement.addEventListener('loadedmetadata', updateDuration);
+      audioElement.addEventListener('error', (e) => {
+        console.error('Audio loading error:', e);
+        document.getElementById('audioTime').innerText = 'Audio unavailable';
+      });
+    }
+
+    function loadCall(idx) {
+      currentCallIdx = idx;
+      selectedPersona = null;
+      selectedApproach = null;
+
+      const call = calls[idx];
+
+      document.getElementById('stageIndicator').innerText = `Call ${idx + 1} of ${calls.length}`;
+      document.getElementById('scoreDisplay').innerText = `Score: ${score} / ${totalQuestions}`;
+      document.getElementById('callTitle').innerText = call.title;
+      document.getElementById('callMeta').innerText = call.meta;
+      
+      // Display transcript
+      const transcriptBox = document.getElementById('transcript');
+      transcriptBox.innerText = call.transcript;
+
+      // Load audio if available
+      if (call.audioSrc) {
+        document.getElementById('audioPlayer').classList.remove('hidden');
+        audioElement.src = call.audioSrc;
+        audioElement.load();
+        isPlaying = false;
+        document.getElementById('playBtn').innerText = '▶';
+        document.getElementById('playBtn').classList.remove('playing');
+        document.getElementById('progressBar').style.width = '0%';
+        document.getElementById('audioTime').innerText = '0:00 / 0:00';
+      } else {
+        document.getElementById('audioPlayer').classList.add('hidden');
+      }
+
+      // Load personas
+      const personaGrid = document.getElementById('personaGrid');
+      personaGrid.innerHTML = '';
+      personas.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'persona-card';
+        card.innerHTML = `
+          <div class="persona-name">${p.name}</div>
+          <div class="persona-desc">${p.desc}</div>
+        `;
+        card.addEventListener('click', () => selectPersona(p.name, card));
+        personaGrid.appendChild(card);
+      });
+
+      // Load approaches
+      const approachOptions = document.getElementById('approachOptions');
+      approachOptions.innerHTML = '';
+      call.approaches.forEach((a, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'approach-btn';
+        btn.innerText = a.text;
+        btn.addEventListener('click', () => selectApproach(i, btn));
+        approachOptions.appendChild(btn);
+      });
+
+      // Show question area, hide feedback
+      document.getElementById('questionArea').classList.remove('hidden');
+      document.getElementById('feedbackPanel').classList.add('hidden');
+    }
+
+    function toggleAudio() {
+      if (isPlaying) {
+        audioElement.pause();
+        document.getElementById('playBtn').innerText = '▶';
+        document.getElementById('playBtn').classList.remove('playing');
+      } else {
+        audioElement.play();
+        document.getElementById('playBtn').innerText = '⏸';
+        document.getElementById('playBtn').classList.add('playing');
+      }
+      isPlaying = !isPlaying;
+    }
+
+    function updateProgress() {
+      const progress = (audioElement.currentTime / audioElement.duration) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+
+      const currentMin = Math.floor(audioElement.currentTime / 60);
+      const currentSec = Math.floor(audioElement.currentTime % 60).toString().padStart(2, '0');
+      const durationMin = Math.floor(audioElement.duration / 60);
+      const durationSec = Math.floor(audioElement.duration % 60).toString().padStart(2, '0');
+
+      document.getElementById('audioTime').innerText = `${currentMin}:${currentSec} / ${durationMin}:${durationSec}`;
+    }
+
+    function updateDuration() {
+      const durationMin = Math.floor(audioElement.duration / 60);
+      const durationSec = Math.floor(audioElement.duration % 60).toString().padStart(2, '0');
+      document.getElementById('audioTime').innerText = `0:00 / ${durationMin}:${durationSec}`;
+    }
+
+    function selectPersona(name, element) {
+      selectedPersona = name;
+      document.querySelectorAll('.persona-card').forEach(c => c.classList.remove('selected'));
+      element.classList.add('selected');
+    }
+
+    function selectApproach(idx, element) {
+      selectedApproach = idx;
+      document.querySelectorAll('.approach-btn').forEach(b => b.classList.remove('selected'));
+      element.classList.add('selected');
+    }
+
+    function submitAnswer() {
+      if (!selectedPersona || selectedApproach === null) {
+        alert('Please select both a persona and an approach before submitting.');
+        return;
+      }
+
+      // Pause audio if playing
+      if (isPlaying) {
+        toggleAudio();
+      }
+
+      const call = calls[currentCallIdx];
+      const personaCorrect = selectedPersona === call.correctPersona;
+      const approachCorrect = call.approaches[selectedApproach].correct;
+
+      totalQuestions += 2;
+      if (personaCorrect) score++;
+      if (approachCorrect) score++;
+
+      // Hide question area
+      document.getElementById('questionArea').classList.add('hidden');
+
+      // Show feedback
+      const feedbackPanel = document.getElementById('feedbackPanel');
+      feedbackPanel.classList.remove('hidden');
+
+      if (personaCorrect && approachCorrect) {
+        feedbackPanel.classList.remove('incorrect');
+      } else {
+        feedbackPanel.classList.add('incorrect');
+      }
+
+      let feedbackTitle = '';
+      let feedbackText = '';
+
+      if (personaCorrect && approachCorrect) {
+        feedbackTitle = 'Excellent Work!';
+        feedbackText = `You correctly identified this as <strong>${call.correctPersona}</strong> and chose the ideal communication approach.`;
+      } else if (personaCorrect && !approachCorrect) {
+        feedbackTitle = 'Persona Correct, Approach Needs Work';
+        feedbackText = `You correctly identified <strong>${call.correctPersona}</strong>, but the approach you selected wasn't the best fit.`;
+      } else if (!personaCorrect && approachCorrect) {
+        feedbackTitle = 'Good Approach, Wrong Persona';
+        feedbackText = `You chose a strong communication approach, but misidentified the persona. This was actually <strong>${call.correctPersona}</strong>.`;
+      } else {
+        feedbackTitle = 'Let\'s Review This One';
+        feedbackText = `The correct persona was <strong>${call.correctPersona}</strong>, and the best approach was different from what you selected.`;
+      }
+
+      document.getElementById('feedbackTitle').innerText = feedbackTitle;
+      document.getElementById('feedbackText').innerHTML = feedbackText;
+      document.getElementById('feedbackInsight').innerHTML = `
+        <strong>Why this matters:</strong> ${call.insight}<br><br>
+        <strong>Approach feedback:</strong> ${call.approaches[selectedApproach].feedback}
+      `;
+
+      document.getElementById('scoreDisplay').innerText = `Score: ${score} / ${totalQuestions}`;
+
+      // Scroll feedback into view
+      setTimeout(() => {
+        feedbackPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+
+    function nextCall() {
+      currentCallIdx++;
+      if (currentCallIdx < calls.length) {
+        loadCall(currentCallIdx);
+      } else {
+        showCompletion();
+      }
+    }
+
+    function showCompletion() {
+      document.getElementById('gameArea').classList.add('hidden');
+      document.getElementById('completionScreen').classList.remove('hidden');
+
+      const percentage = Math.round((score / totalQuestions) * 100);
+      document.getElementById('finalScore').innerText = percentage + '%';
+
+      let badge = '';
+      let feedback = '';
+
+      if (percentage >= 90) {
+        badge = 'Persona Master';
+        document.getElementById('masteryBadge').className = 'mastery-badge badge-master';
+        feedback = 'Outstanding! You have a strong ability to read caller personas and adapt your communication style accordingly.';
+      } else if (percentage >= 70) {
+        badge = 'Proficient Adapter';
+        document.getElementById('masteryBadge').className = 'mastery-badge badge-proficient';
+        feedback = 'Great work! You\'re recognizing most personas and choosing appropriate approaches. Keep refining your pattern recognition.';
+      } else {
+        badge = 'Developing Skills';
+        document.getElementById('masteryBadge').className = 'mastery-badge badge-developing';
+        feedback = 'You\'re building important skills. Review the feedback from each call and practice identifying the emotional and communication cues that define each persona.';
+      }
+
+      document.getElementById('masteryBadge').innerText = badge;
+      document.getElementById('finalFeedback').innerText = feedback;
+
+      // Send completion to Rise 360
+      if (window.parent) {
+        window.parent.postMessage({ type: 'complete' }, '*');
+      }
+    }
+
+    initGame();
+  </script>
+</body>
+</html>
